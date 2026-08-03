@@ -56,6 +56,7 @@ Input
 
 Release candidate for Cerebro 0.1.0.
 
+
 ## Minimal runtime
 
 Run the executable acceptance suite:
@@ -71,3 +72,20 @@ python -m cerebro_runtime path/to/task.yaml
 ```
 
 The runtime is intentionally minimal and deterministic. Work-mode classification is driven by explicit task features and the configured scoring model.
+
+## Local tooling
+
+All tooling runs locally. Python is a replaceable reference implementation and support tool; Cerebro's authoritative rules remain in the machine-readable YAML and schema files.
+
+Double-click the Windows launchers in `scripts/`, or use the shared command line entry point:
+
+```bash
+python cerebro_tool.py test
+python cerebro_tool.py validate
+python cerebro_tool.py report
+python cerebro_tool.py checksum
+python cerebro_tool.py zip
+python cerebro_tool.py build
+```
+
+`build` runs tests, regenerates checksums, validates the release, creates a human-readable report, and packages a ZIP.
