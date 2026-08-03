@@ -2,46 +2,36 @@ schema: cerebro-standard/v0.1
 standard:
   id: STD-PATCH
   name: Patch Package Standard
-  version: 0.1.2
+  version: 0.1.3
   status: approved
   authority: authoritative
-  scope: Portable, self-installing, traceable, and verifiable Cerebro patch packages.
+  scope: Automatically built, portable, self-installing, and validated Cerebro patch
+    packages.
   consumers:
-  - builder
-  - packager
-  - validator
-  - maintainer
+  - patch-builder
+  - patch-validator
   - patch-installer
+  - builder
+  - maintainer
 rules:
 - id: STD-PATCH-R001
-  statement: Every installable patch shall contain INSTALL_PATCH.bat, installer/patch_installer.py,
-    and installer/locate_cerebro.py.
+  statement: Every distributed patch shall be generated from declarative input.
   priority: critical
   verification:
-  - All three files exist in the patch package.
+  - Patch Builder generates the manifest and package files.
 - id: STD-PATCH-R002
-  statement: The installer shall support repository discovery and shall not require
-    hardcoded command-line paths.
+  statement: Every patch shall pass directory validation and packaged ZIP validation.
   priority: critical
   verification:
-  - INSTALL_PATCH.bat invokes the installer without repository arguments.
-  - The locator resolves or prompts for paths.
+  - Both stages return PASS before distribution.
 - id: STD-PATCH-R003
-  statement: Resolved local paths shall be stored outside the repository as local
-    user configuration.
-  priority: high
-  verification:
-  - Settings are stored under LOCALAPPDATA/Cerebro/settings.json.
-- id: STD-PATCH-R004
-  statement: Manual path entry shall remain available when automatic discovery fails.
-  priority: high
-  verification:
-  - Interactive prompt validates cerebro.yaml and cerebro_tool.py.
-- id: STD-PATCH-R005
-  statement: Source and destination checksums, backup, and post-install verification
-    remain mandatory.
+  statement: Every payload file shall be registered exactly once with a valid SHA-256
+    digest.
   priority: critical
   verification:
-  - All payload hashes are checked before and after copying.
-  - Replaced files are backed up.
-  - Manifest verification commands run.
+  - No unregistered or missing payload files exist.
+- id: STD-PATCH-R004
+  statement: Patch documentation and installer entrypoints shall be generated consistently.
+  priority: high
+  verification:
+  - Required root and installer files exist.

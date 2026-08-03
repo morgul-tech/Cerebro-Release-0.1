@@ -1,0 +1,74 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-patch-manifest/v0.1
+title: Cerebro Patch Manifest
+type: object
+additionalProperties: false
+required:
+- schema
+- patch
+- files
+- verification
+properties:
+  schema:
+    const: cerebro-patch-manifest/v0.1
+  patch:
+    type: object
+    additionalProperties: false
+    required:
+    - id
+    - name
+    - target
+    - prerequisite
+    properties:
+      id:
+        type: string
+        pattern: ^[0-9]{4}[A-Z]?$
+      name:
+        type: string
+        minLength: 1
+      target:
+        type: string
+        minLength: 1
+      prerequisite:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+      includes:
+        type: array
+        uniqueItems: true
+        items:
+          type: string
+  files:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required:
+      - source
+      - destination
+      - operation
+      - sha256
+      properties:
+        source:
+          type: string
+          pattern: ^repo/.+
+        destination:
+          type: string
+          pattern: ^\{(REPOSITORY_ROOT|SCRIPTS_ROOT)\}/.+
+        operation:
+          enum:
+          - add
+          - replace
+          - delete
+        sha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+  verification:
+    type: array
+    items:
+      type: array
+      minItems: 1
+      items:
+        type: string
