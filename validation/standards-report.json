@@ -8,6 +8,7 @@
     "standards/naming.yaml",
     "standards/patch-package.yaml",
     "standards/publication-gate.yaml",
+    "standards/quality-gate.yaml",
     "standards/release.yaml",
     "standards/report.yaml",
     "standards/repository.yaml",
