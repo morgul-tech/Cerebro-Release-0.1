@@ -54,8 +54,7 @@ Input
 
 ## Status
 
-Development baseline for Release 0.1.
-
+Release candidate for Cerebro 0.1.0.
 
 ## Minimal runtime
 
