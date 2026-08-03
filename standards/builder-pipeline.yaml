@@ -1,0 +1,43 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-BUILDER
+  name: Builder Pipeline Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Deterministic orchestration, reporting, and failure handling for Builder
+    v1.
+  consumers:
+  - builder
+  - pipeline-runner
+  - validator
+  - release-manager
+rules:
+- id: STD-BUILDER-R001
+  statement: Production release builds shall execute through one declarative pipeline.
+  priority: critical
+  verification:
+  - build_release.py delegates to run_pipeline.py.
+- id: STD-BUILDER-R002
+  statement: Pipeline stages shall have stable identifiers, explicit scripts, required
+    flags, and deterministic order.
+  priority: critical
+  verification:
+  - Pipeline configuration validates against its schema.
+- id: STD-BUILDER-R003
+  statement: The pipeline shall stop on the first failed required stage when fail_fast
+    is enabled.
+  priority: critical
+  verification:
+  - The report identifies failed_stage.
+- id: STD-BUILDER-R004
+  statement: Every pipeline execution shall generate a machine-readable report.
+  priority: critical
+  verification:
+  - validation/builder-pipeline-report.json is generated.
+- id: STD-BUILDER-R005
+  statement: Individual tools may remain callable for diagnosis, while production
+    build status is determined by the pipeline.
+  priority: high
+  verification:
+  - CLI exposes pipeline and diagnostic commands.

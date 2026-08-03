@@ -31,9 +31,6 @@ documents:
 - id: STD-RELEASE
   path: standards/release.yaml
   required: true
-- id: STD-BUILDER
-  path: standards/builder-pipeline.yaml
-  required: true
 governance:
   policy_over_implementation: true
   single_source_of_truth: true
