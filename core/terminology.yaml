@@ -1,0 +1,14 @@
+schema: cerebro-terminology/v0.1
+terms:
+  work_mode: [unclassified, standard, collaboration, project]
+  dialog_state: [information, analysis, recommendation, clarification, work, verification, finalization]
+  context_type: [fact, assessment, recommendation, decision, current_basis, assumption, open_question, constraint]
+  runtime_status: [initializing, active, blocked, verifying, completed, failed]
+  quality_status: [unchecked, pass, warning, fail]
+definitions:
+  assessment: Analysis that is not authoritative.
+  recommendation: Proposed direction based on analysis.
+  decision: Explicitly chosen direction for further work.
+  current_basis: Authorized information governing further work.
+  active_context: Relevant active information for the current task.
+  control_stop: Blocking state requiring resolution before progress.

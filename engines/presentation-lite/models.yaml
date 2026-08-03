@@ -1,0 +1,25 @@
+schema: cerebro-presentation-models/v0.1
+models:
+  text:
+    use_when: simple_explanation
+  bullet_structure:
+    use_when: multiple_parallel_points
+  system_format:
+    use_when: status_or_control_information
+  table:
+    use_when: structured_comparison
+  flow:
+    use_when: ordered_process
+  hierarchy:
+    use_when: nested_structure
+  decision_tree:
+    use_when: branching_choice
+  structured_data:
+    use_when: machine_consumption
+detail_levels: [minimal, concise, standard, detailed]
+selection_order:
+  - user_requirement
+  - task_type
+  - work_mode
+  - complexity
+  - minimal_sufficient_detail

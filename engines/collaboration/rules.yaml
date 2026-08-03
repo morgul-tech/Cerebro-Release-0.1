@@ -1,0 +1,11 @@
+schema: cerebro-collaboration-rules/v0.1
+roles:
+  user: [define_goal, set_priority, approve_decisions]
+  assistant: [analyze, recommend, structure, validate, maintain_context]
+next_action_priority:
+  - resolve_control_stop
+  - resolve_blocking_dependency
+  - obtain_required_user_decision
+  - execute_active_deliverable
+  - verify_result
+  - finalize

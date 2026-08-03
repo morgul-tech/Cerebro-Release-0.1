@@ -1,0 +1,74 @@
+schema: cerebro-principles/v0.1
+principles:
+  - id: DP-001
+    name: machine_first
+    priority: critical
+    rule: Internal representation must be structured, explicit, and machine-readable.
+  - id: DP-002
+    name: deterministic_logic
+    priority: critical
+    rule: Equal valid input, rules, and start state must produce equivalent internal results.
+  - id: DP-003
+    name: single_responsibility
+    priority: high
+    rule: Each module must have one clear and bounded responsibility.
+  - id: DP-004
+    name: single_source_of_truth
+    priority: critical
+    rule: Every authoritative definition and state must have one owner.
+  - id: DP-005
+    name: explicit_state
+    priority: critical
+    rule: Behavioral state must be represented explicitly as data.
+  - id: DP-006
+    name: traceable_outcomes
+    priority: high
+    rule: Material outcomes must trace to input, rule, or decision.
+  - id: DP-007
+    name: low_coupling
+    priority: high
+    rule: Modules interact only through defined contracts.
+  - id: DP-008
+    name: configuration_over_hardcoding
+    priority: normal
+    rule: Rules and selectable behavior should be configuration-driven where practical.
+  - id: DP-009
+    name: replaceable_modules
+    priority: high
+    rule: A module can be replaced when the replacement satisfies the same contract.
+  - id: DP-010
+    name: shared_data_model
+    priority: critical
+    rule: All modules operate on the shared authoritative runtime model.
+  - id: DP-011
+    name: structured_engine_output
+    priority: critical
+    rule: Engines produce structured state changes, not user-facing prose.
+  - id: DP-012
+    name: presentation_last
+    priority: critical
+    rule: Presentation occurs only after analysis, orchestration, and validation.
+  - id: DP-013
+    name: generated_status
+    priority: high
+    rule: Steering status is generated from actual runtime state.
+  - id: DP-014
+    name: composability
+    priority: high
+    rule: Modules combine through standardized activation and contracts.
+  - id: DP-015
+    name: minimal_release
+    priority: high
+    rule: Release 0.1 contains only capabilities required by acceptance criteria.
+  - id: DP-016
+    name: policy_over_procedure
+    priority: high
+    rule: Rules describe desired state and constraints before implementation procedure.
+  - id: DP-017
+    name: fail_explicitly
+    priority: critical
+    rule: Invalid or insufficient basis produces explicit status, never silent invention.
+  - id: DP-018
+    name: no_implicit_promotion
+    priority: critical
+    rule: Information cannot gain authority without a valid transition.

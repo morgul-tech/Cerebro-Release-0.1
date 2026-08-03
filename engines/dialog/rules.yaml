@@ -1,0 +1,12 @@
+schema: cerebro-dialog-rules/v0.1
+assessment_factors:
+  dependent_steps: {none: 0, some: 1, many: 2}
+  continuity_required: {"no": 0, "yes": 2}
+  deliverable_count: {one: 0, multiple: 2}
+  ambiguity_risk: {low: 0, medium: 1, high: 2}
+  duration: {single_response: 0, multi_turn: 1, extended: 2}
+thresholds:
+  standard: {min: 0, max: 2}
+  collaboration: {min: 3, max: 5}
+  project: {min: 6, max: 10}
+tie_breaker: highest_mode

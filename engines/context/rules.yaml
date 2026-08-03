@@ -1,0 +1,27 @@
+schema: cerebro-context-rules/v0.1
+authority_levels:
+  unclassified: 0
+  informational: 1
+  analytical: 2
+  advisory: 3
+  decided: 4
+  governing: 5
+transitions:
+  fact:
+    to: [current_basis]
+    requires: [relevance_validation]
+  assessment:
+    to: [recommendation]
+    requires: [reasoning_complete]
+  recommendation:
+    to: [decision]
+    requires: [authorized_approval]
+  decision:
+    to: [current_basis]
+    requires: [activation]
+  assumption:
+    to: [fact]
+    requires: [source_confirmation]
+forbidden:
+  - source: assistant_inference
+    target_types: [decision, current_basis]

@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-trace-event/v0.1
+type: object
+additionalProperties: false
+required: [id, sequence, type, actor, input_refs, output_refs, rule_refs, result]
+properties:
+  id: {type: string, pattern: '^evt-[a-z0-9-]+$'}
+  sequence: {type: integer, minimum: 1}
+  type:
+    enum: [runtime_initialized, work_mode_selected, module_activated, module_deactivated, dialog_state_changed, context_item_added, context_item_updated, recommendation_created, decision_registered, current_basis_updated, control_stop_created, control_stop_resolved, quality_check_completed, presentation_selected, deliverable_updated, runtime_completed, runtime_failed]
+  actor: {type: string}
+  input_refs: {type: array, uniqueItems: true, items: {type: string}}
+  output_refs: {type: array, uniqueItems: true, items: {type: string}}
+  rule_refs: {type: array, uniqueItems: true, items: {type: string}}
+  result: {enum: [success, warning, rejected, failed]}

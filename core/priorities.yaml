@@ -1,0 +1,12 @@
+schema: cerebro-priorities/v0.1
+priority_order:
+  - safety_and_platform_constraints
+  - validity_and_authority
+  - deterministic_execution
+  - state_integrity
+  - module_contracts
+  - quality
+  - presentation
+conflict_resolution:
+  strategy: highest_priority_then_lowest_rule_id
+  unresolved: control_stop

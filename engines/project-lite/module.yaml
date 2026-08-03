@@ -1,0 +1,30 @@
+schema: cerebro-module-contract/v0.1
+module:
+  id: project-lite
+  version: 0.1.0
+  type: engine
+  responsibility: Maintain minimal project phases, deliverables, dependencies, and next action.
+  deterministic: true
+  idempotent_activation: true
+accepts:
+  runtime_schema: cerebro-runtime/v0.1
+  required_fields: [task.goal, dialog.work_mode]
+produces:
+  mutations: [project]
+  events: [deliverable_updated]
+  errors: [E001, E004]
+permissions:
+  read: [task, dialog, context, project]
+  write: [project]
+  forbidden: [context.items, quality, presentation]
+activation:
+  mode: work_mode
+  conditions:
+    - field: dialog.work_mode
+      operator: equals
+      value: project
+  priority: high
+failure_behavior:
+  on_invalid_input: control_stop
+  on_internal_failure: fail_runtime
+  rollback: atomic

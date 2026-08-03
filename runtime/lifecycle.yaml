@@ -1,0 +1,22 @@
+schema: cerebro-lifecycle/v0.1
+pipeline:
+  - normalize_input
+  - classify_task
+  - assess_work_mode
+  - activate_modules
+  - run_context_transform
+  - run_dialog_transform
+  - run_collaboration_transform
+  - run_project_transform
+  - detect_conflicts
+  - run_quality_gates
+  - select_presentation
+  - render_output
+execution:
+  model: pure_state_transformations
+  transaction: atomic_per_stage
+  stabilization:
+    enabled: true
+    max_cycles: 8
+    stop_when: state_hash_unchanged
+    on_limit: fail_runtime

@@ -1,0 +1,27 @@
+schema: cerebro-module-contract/v0.1
+module:
+  id: quality-lite
+  version: 0.1.0
+  type: validator
+  responsibility: Validate runtime integrity, authority, constraints, and deliverables.
+  deterministic: true
+  idempotent_activation: true
+accepts:
+  runtime_schema: cerebro-runtime/v0.1
+  required_fields: [runtime, task, dialog, context]
+produces:
+  mutations: [quality]
+  events: [quality_check_completed]
+  errors: [E003, E005, E007, E008, E010]
+permissions:
+  read: [runtime, task, dialog, context, project, presentation]
+  write: [quality]
+  forbidden: [task, dialog, context.items, project, presentation]
+activation:
+  mode: always
+  conditions: []
+  priority: critical
+failure_behavior:
+  on_invalid_input: reject
+  on_internal_failure: fail_runtime
+  rollback: atomic

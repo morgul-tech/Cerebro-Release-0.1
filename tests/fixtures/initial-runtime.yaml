@@ -1,0 +1,36 @@
+schema: cerebro-runtime/v0.1
+runtime:
+  release: 0.1.0
+  session_id: test-session-001
+  status: initializing
+task:
+  id: test-task-001
+  input: Develop Cerebro Release 0.1.
+  goal: null
+  scope: null
+  constraints: []
+  expected_outputs: []
+dialog:
+  work_mode: unclassified
+  state: information
+  active_modules: [dialog, context]
+  clarification_required: false
+  control_stop: null
+context:
+  items: []
+project:
+  active: false
+  phase: null
+  deliverables: []
+  dependencies: []
+  next_action: null
+quality:
+  status: unchecked
+  checks: []
+  issues: []
+presentation:
+  model: unselected
+  detail_level: standard
+  status_visible: false
+trace:
+  events: []

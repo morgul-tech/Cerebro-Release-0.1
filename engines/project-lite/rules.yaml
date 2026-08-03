@@ -1,0 +1,10 @@
+schema: cerebro-project-lite-rules/v0.1
+phases: [startup, analysis, planning, execution, control, finalization]
+required_project_fields: [task.goal, project.deliverables]
+phase_rules:
+  startup: [goal_defined, scope_assessed]
+  analysis: [requirements_identified]
+  planning: [deliverables_defined, dependencies_defined]
+  execution: [active_deliverable_exists]
+  control: [quality_checked]
+  finalization: [required_deliverables_completed]

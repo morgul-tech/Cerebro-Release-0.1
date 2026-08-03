@@ -1,0 +1,10 @@
+schema: cerebro-dialog-transitions/v0.1
+transitions:
+  information: [analysis, clarification, finalization]
+  analysis: [recommendation, clarification, work, verification]
+  recommendation: [clarification, work, finalization]
+  clarification: [analysis, work]
+  work: [clarification, verification]
+  verification: [work, clarification, finalization]
+  finalization: [work]
+on_invalid: E005

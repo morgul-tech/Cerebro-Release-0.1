@@ -1,0 +1,20 @@
+schema: cerebro-activation/v0.1
+always:
+  - dialog
+  - context
+by_work_mode:
+  standard:
+    - presentation-lite
+    - quality-lite
+  collaboration:
+    - collaboration
+    - quality-lite
+    - presentation-lite
+  project:
+    - collaboration
+    - project-lite
+    - quality-lite
+    - presentation-lite
+rules:
+  idempotent: true
+  missing_required_module: fail_runtime

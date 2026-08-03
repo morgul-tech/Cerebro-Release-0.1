@@ -1,0 +1,27 @@
+schema: cerebro-module-contract/v0.1
+module:
+  id: presentation-lite
+  version: 0.1.0
+  type: renderer
+  responsibility: Select and render the user-facing presentation from validated state.
+  deterministic: true
+  idempotent_activation: true
+accepts:
+  runtime_schema: cerebro-runtime/v0.1
+  required_fields: [dialog, quality]
+produces:
+  mutations: [presentation]
+  events: [presentation_selected]
+  errors: []
+permissions:
+  read: [runtime, task, dialog, context, project, quality]
+  write: [presentation]
+  forbidden: [task, dialog, context.items, project, quality]
+activation:
+  mode: always
+  conditions: []
+  priority: normal
+failure_behavior:
+  on_invalid_input: warning
+  on_internal_failure: disable_module
+  rollback: atomic

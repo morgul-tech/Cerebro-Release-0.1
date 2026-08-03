@@ -1,0 +1,15 @@
+schema: cerebro-acceptance/v0.1
+execution:
+  runner: python-unittest
+  file: tests/acceptance/test_runtime.py
+scenarios:
+  - {id: AC-001, description: Simple factual question, test: test_ac001_standard_mode}
+  - {id: AC-002, description: Multi-step collaborative task, test: test_ac002_collaboration_mode}
+  - {id: AC-003, description: Larger project with multiple deliverables, test: test_ac003_project_mode}
+  - {id: AC-004, description: Recommendation remains non-authoritative, test: test_ac004_recommendation_not_decision}
+  - {id: AC-005, description: User approval creates decision, test: test_ac005_approval_creates_decision}
+  - {id: AC-006, description: Conflicting decisions trigger stop, test: test_ac006_conflicting_decisions_stop}
+  - {id: AC-007, description: Missing non-critical detail, test: test_ac007_noncritical_missing_detail_warns}
+  - {id: AC-008, description: Missing critical goal, test: test_ac008_missing_required_goal_blocks}
+  - {id: AC-009, description: Repeated identical execution, test: test_ac009_repeated_execution_equivalent}
+  - {id: AC-010, description: Presentation changes without analytical mutation, test: test_ac010_presentation_does_not_mutate_analysis}

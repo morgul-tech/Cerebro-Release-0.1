@@ -1,0 +1,32 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-module-contract/v0.1
+type: object
+additionalProperties: false
+required: [schema, module, accepts, produces, permissions, activation, failure_behavior]
+properties:
+  schema: {const: cerebro-module-contract/v0.1}
+  module:
+    type: object
+    required: [id, version, type, responsibility, deterministic, idempotent_activation]
+    properties:
+      id: {type: string, pattern: '^[a-z][a-z0-9-]*$'}
+      version: {type: string}
+      type: {enum: [core, engine, validator, renderer, runtime]}
+      responsibility: {type: string}
+      deterministic: {const: true}
+      idempotent_activation: {type: boolean}
+  accepts:
+    type: object
+    required: [runtime_schema, required_fields]
+  produces:
+    type: object
+    required: [mutations, events, errors]
+  permissions:
+    type: object
+    required: [read, write, forbidden]
+  activation:
+    type: object
+    required: [mode, conditions, priority]
+  failure_behavior:
+    type: object
+    required: [on_invalid_input, on_internal_failure, rollback]

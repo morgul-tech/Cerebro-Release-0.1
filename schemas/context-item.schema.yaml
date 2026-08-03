@@ -1,0 +1,26 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-context-item/v0.1
+type: object
+additionalProperties: false
+required: [id, type, value, status, authority_level, source, relations]
+properties:
+  id: {type: string, pattern: '^ctx-[a-z0-9-]+$'}
+  type: {enum: [fact, assessment, recommendation, decision, current_basis, assumption, open_question, constraint]}
+  value: {}
+  status: {enum: [proposed, active, superseded, rejected, resolved, archived]}
+  authority_level: {type: integer, minimum: 0, maximum: 5}
+  source:
+    type: object
+    required: [type]
+    properties:
+      type: {enum: [user, rule, assistant_inference, external_source, system]}
+      reference: {type: [string, 'null']}
+      verified: {type: boolean}
+  relations:
+    type: object
+    required: [derived_from, supports, conflicts_with, supersedes]
+    properties:
+      derived_from: {type: array, uniqueItems: true, items: {type: string}}
+      supports: {type: array, uniqueItems: true, items: {type: string}}
+      conflicts_with: {type: array, uniqueItems: true, items: {type: string}}
+      supersedes: {type: array, uniqueItems: true, items: {type: string}}

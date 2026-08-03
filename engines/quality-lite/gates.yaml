@@ -1,0 +1,14 @@
+schema: cerebro-quality-gates/v0.1
+gates:
+  - id: QG-INPUT
+    checks: [task_input_exists, runtime_schema_valid]
+  - id: QG-ORCHESTRATION
+    checks: [work_mode_selected, dialog_state_valid, required_modules_active]
+  - id: QG-CONTEXT
+    checks: [decision_sources_valid, no_unapproved_current_basis, no_blocking_conflict]
+  - id: QG-DELIVERY
+    checks: [goal_satisfied, constraints_respected, required_deliverables_present, presentation_selected]
+status_rules:
+  fail: any_required_check_failed
+  warning: no_fail_and_any_warning
+  pass: all_required_checks_passed

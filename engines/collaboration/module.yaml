@@ -1,0 +1,27 @@
+schema: cerebro-module-contract/v0.1
+module:
+  id: collaboration
+  version: 0.1.0
+  type: engine
+  responsibility: Coordinate roles, clarification needs, and next collaborative action.
+  deterministic: true
+  idempotent_activation: true
+accepts:
+  runtime_schema: cerebro-runtime/v0.1
+  required_fields: [dialog.work_mode, context.items]
+produces:
+  mutations: [project.next_action]
+  events: []
+  errors: []
+permissions:
+  read: [task, dialog, context, project]
+  write: [project.next_action]
+  forbidden: [context.items, quality, presentation]
+activation:
+  mode: work_mode
+  conditions: []
+  priority: high
+failure_behavior:
+  on_invalid_input: warning
+  on_internal_failure: control_stop
+  rollback: atomic

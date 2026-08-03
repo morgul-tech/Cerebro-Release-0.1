@@ -1,0 +1,37 @@
+schema: cerebro-release/v0.1
+release:
+  name: Cerebro
+  version: 0.1.0
+  status: release-candidate
+runtime:
+  schema: schemas/runtime.schema.yaml
+  lifecycle: runtime/lifecycle.yaml
+  activation: runtime/activation.yaml
+  errors: runtime/error-codes.yaml
+core:
+  principles: core/principles.yaml
+  terminology: core/terminology.yaml
+  priorities: core/priorities.yaml
+engines:
+  - id: dialog
+    path: engines/dialog/
+    required: true
+  - id: context
+    path: engines/context/
+    required: true
+  - id: collaboration
+    path: engines/collaboration/
+    required: true
+  - id: project-lite
+    path: engines/project-lite/
+    required: false
+  - id: quality-lite
+    path: engines/quality-lite/
+    required: true
+  - id: presentation-lite
+    path: engines/presentation-lite/
+    required: true
+validation:
+  deterministic: true
+  pure_state_transformations: true
+  max_stabilization_cycles: 8

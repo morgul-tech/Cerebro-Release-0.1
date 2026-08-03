@@ -1,0 +1,67 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-runtime/v0.1
+type: object
+additionalProperties: false
+required: [schema, runtime, task, dialog, context, project, quality, presentation, trace]
+properties:
+  schema:
+    const: cerebro-runtime/v0.1
+  runtime:
+    type: object
+    required: [release, status]
+    properties:
+      release: {const: 0.1.0}
+      session_id: {type: [string, 'null']}
+      status: {enum: [initializing, active, blocked, verifying, completed, failed]}
+  task:
+    type: object
+    required: [input, constraints, expected_outputs]
+    properties:
+      id: {type: [string, 'null']}
+      input: {}
+      goal: {type: [string, object, 'null']}
+      scope: {type: [string, object, 'null']}
+      constraints: {type: array}
+      expected_outputs: {type: array}
+  dialog:
+    type: object
+    required: [work_mode, state, active_modules, clarification_required, control_stop]
+    properties:
+      work_mode: {enum: [unclassified, standard, collaboration, project]}
+      state: {enum: [information, analysis, recommendation, clarification, work, verification, finalization]}
+      active_modules: {type: array, uniqueItems: true, items: {type: string}}
+      clarification_required: {type: boolean}
+      control_stop: {type: [object, 'null']}
+  context:
+    type: object
+    required: [items]
+    properties:
+      items: {type: array}
+  project:
+    type: object
+    required: [active, deliverables, dependencies]
+    properties:
+      active: {type: boolean}
+      phase: {enum: [null, startup, analysis, planning, execution, control, finalization]}
+      deliverables: {type: array}
+      dependencies: {type: array}
+      next_action: {type: [object, 'null']}
+  quality:
+    type: object
+    required: [status, checks, issues]
+    properties:
+      status: {enum: [unchecked, pass, warning, fail]}
+      checks: {type: array}
+      issues: {type: array}
+  presentation:
+    type: object
+    required: [model, detail_level, status_visible]
+    properties:
+      model: {enum: [unselected, text, bullet_structure, system_format, table, flow, hierarchy, decision_tree, structured_data]}
+      detail_level: {enum: [minimal, concise, standard, detailed]}
+      status_visible: {type: boolean}
+  trace:
+    type: object
+    required: [events]
+    properties:
+      events: {type: array}

@@ -1,0 +1,36 @@
+schema: cerebro-release-criteria/v0.1
+criteria:
+  - id: RV-001
+    name: yaml_parse
+    required: true
+  - id: RV-002
+    name: manifest_references
+    required: true
+  - id: RV-003
+    name: module_contract_schema
+    required: true
+  - id: RV-004
+    name: runtime_fixture_schema
+    required: true
+  - id: RV-005
+    name: activation_registry
+    required: true
+  - id: RV-006
+    name: transition_integrity
+    required: true
+  - id: RV-007
+    name: error_reference_integrity
+    required: true
+  - id: RV-008
+    name: acceptance_scenario_coverage
+    required: true
+  - id: RV-009
+    name: executable_acceptance_tests
+    required: true
+  - id: RV-010
+    name: determinism_replay
+    required: true
+  - id: RV-011
+    name: integrity_manifest
+    required: true
+release_rule: all_required_criteria_pass

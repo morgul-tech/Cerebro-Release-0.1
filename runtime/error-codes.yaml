@@ -1,0 +1,12 @@
+schema: cerebro-errors/v0.1
+errors:
+  E001: missing_required_goal
+  E002: missing_required_constraint
+  E003: conflicting_decisions
+  E004: ambiguous_scope
+  E005: invalid_state_transition
+  E006: unsupported_operation
+  E007: insufficient_source_basis
+  E008: quality_failure
+  E009: stabilization_limit_exceeded
+  E010: unauthorized_state_mutation
