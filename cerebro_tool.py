@@ -12,6 +12,7 @@ COMMANDS = {
     "test": ROOT / "tooling/tests/run_tests.py",
     "validate": ROOT / "tooling/validator/validate.py",
     "valider": ROOT / "tooling/validation/valider.py",
+    "mcp": ROOT / "tooling/control/mcp.py",
     "standards": ROOT / "tooling/standards/validate_standards.py",
     "repository": ROOT / "tooling/repository/check_repository.py",
     "report": ROOT / "tooling/reporter/generate_report.py",
@@ -25,7 +26,7 @@ COMMANDS = {
     "quality": ROOT / "tooling/quality/quality_gate.py",
 }
 
-DEPENDENCY_REQUIRED = set(COMMANDS) - {"dependencies", "valider"}
+DEPENDENCY_REQUIRED = set(COMMANDS) - {"dependencies", "valider", "mcp"}
 
 
 def run_script(script: Path, *arguments: str) -> int:

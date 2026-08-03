@@ -28,6 +28,7 @@ validation:
   deterministic: true
   pure_state_transformations: true
   max_stabilization_cycles: 8
+  mcp_included: true
 engines:
 - id: dialog
   path: engines/dialog/
@@ -46,4 +47,11 @@ engines:
   required: true
 - id: presentation-lite
   path: engines/presentation-lite/
+  required: true
+mcp:
+  manifest: mcp/manifest.yaml
+  standard: standards/mcp.yaml
+  controller: tooling/control/mcp.py
+  level: 1
+  default_state: active
   required: true

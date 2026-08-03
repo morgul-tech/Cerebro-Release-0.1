@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE_REPO = "morgul-tech/Cerebro-Source-1.0"
 RELEASE_REPO = "morgul-tech/Cerebro-Release-0.1"
 BRANCH = "main"
+MCP_STATE_FILE = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "Cerebro" / "mcp-state.json"
 
 MODES = (
     "quick",
@@ -134,7 +135,7 @@ def validate_source() -> tuple[Check, dict[str, Any]]:
             errors.append("single source of truth")
         if governance.get("common_validation_entrypoint") != "valider":
             errors.append("valider entrypoint")
-        for standard_id in ("STD-SOURCE", "STD-PUBLICATION", "STD-QUALITY", "STD-VALIDER"):
+        for standard_id in ("STD-MCP", "STD-SOURCE", "STD-PUBLICATION", "STD-QUALITY", "STD-VALIDER"):
             if standard_id not in documents:
                 errors.append(standard_id)
 
@@ -170,6 +171,7 @@ def validate_release() -> tuple[Check, dict[str, Any]]:
         if registry.get("standards_engine", {}).get("role") != "derived-policy-registry":
             errors.append("derived registry")
         for standard_id in (
+            "STD-MCP",
             "STD-SOURCE",
             "STD-BUILDER",
             "STD-PUBLICATION",
@@ -218,13 +220,33 @@ def validate_sync(
         for item in release_data["registry"].get("documents", [])
     }
 
-    authoritative = {"STD-SOURCE", "STD-PUBLICATION", "STD-QUALITY", "STD-VALIDER"}
+    authoritative = {"STD-MCP", "STD-SOURCE", "STD-PUBLICATION", "STD-QUALITY", "STD-VALIDER"}
     missing = authoritative - release_ids
     if not authoritative.issubset(source_ids):
         return Check("Sync", "fail", "Source authority registry incomplete")
     if missing:
         return Check("Sync", "fail", "Release missing " + ", ".join(sorted(missing)))
     return Check("Sync", "pass", "Authoritative standards represented")
+
+
+def mcp_check() -> Check:
+    try:
+        manifest = remote_yaml(SOURCE_REPO, "mcp/manifest.yaml")
+        if manifest.get("mcp", {}).get("level") != 1:
+            return Check("MCP", "fail", "MCP level is not 1")
+        if manifest.get("mcp", {}).get("default_state") != "active":
+            return Check("MCP", "fail", "MCP is not active by default")
+
+        state = "active"
+        if MCP_STATE_FILE.is_file():
+            local = json.loads(MCP_STATE_FILE.read_text(encoding="utf-8"))
+            state = local.get("state", "active")
+
+        if state == "inactive":
+            return Check("MCP", "warning", "Inactive by user command")
+        return Check("MCP", "pass", "Level 1 · Active")
+    except Exception as exc:
+        return Check("MCP", "fail", str(exc))
 
 
 def gate_check(name: str, path: str) -> Check:
@@ -249,7 +271,7 @@ def run_local(name: str, arguments: list[str]) -> Check:
 
 
 def quick_checks(target: str = "both") -> list[Check]:
-    checks: list[Check] = []
+    checks: list[Check] = [mcp_check()]
     source_check = Check("Source", "not_checked")
     release_check = Check("Release", "not_checked")
     source_data: dict[str, Any] = {}
