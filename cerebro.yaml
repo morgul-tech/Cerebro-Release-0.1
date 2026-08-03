@@ -22,26 +22,28 @@ standards:
   manifest: standards/standards.yaml
   schema: schemas/standard-document.schema.yaml
   validator: tooling/standards/validate_standards.py
-engines:
-  - id: dialog
-    path: engines/dialog/
-    required: true
-  - id: context
-    path: engines/context/
-    required: true
-  - id: collaboration
-    path: engines/collaboration/
-    required: true
-  - id: project-lite
-    path: engines/project-lite/
-    required: false
-  - id: quality-lite
-    path: engines/quality-lite/
-    required: true
-  - id: presentation-lite
-    path: engines/presentation-lite/
-    required: true
 validation:
+  common_entrypoint: valider
+  command: python cerebro_tool.py valider
   deterministic: true
   pure_state_transformations: true
   max_stabilization_cycles: 8
+engines:
+- id: dialog
+  path: engines/dialog/
+  required: true
+- id: context
+  path: engines/context/
+  required: true
+- id: collaboration
+  path: engines/collaboration/
+  required: true
+- id: project-lite
+  path: engines/project-lite/
+  required: false
+- id: quality-lite
+  path: engines/quality-lite/
+  required: true
+- id: presentation-lite
+  path: engines/presentation-lite/
+  required: true
