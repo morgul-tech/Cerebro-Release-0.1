@@ -12,7 +12,6 @@ COMMANDS = {
     "test": ROOT / "tooling/tests/run_tests.py",
     "validate": ROOT / "tooling/validator/validate.py",
     "standards": ROOT / "tooling/standards/validate_standards.py",
-    "repository": ROOT / "tooling/repository/check_repository.py",
     "report": ROOT / "tooling/reporter/generate_report.py",
     "checksum": ROOT / "tooling/integrity/generate_checksums.py",
     "zip": ROOT / "tooling/packager/create_zip.py",
@@ -21,15 +20,17 @@ COMMANDS = {
 }
 
 DEPENDENCY_REQUIRED = {
-    "test", "validate", "standards", "repository",
-    "report", "checksum", "zip", "build",
+    "test",
+    "validate",
+    "standards",
+    "report",
+    "checksum",
+    "zip",
+    "build",
 }
 
 
 def run_script(script: Path, *args: str) -> int:
-    if not script.is_file():
-        print(f"[FAIL] Required tooling file is missing: {script}")
-        return 4
     return subprocess.run(
         [sys.executable, str(script), *args],
         cwd=ROOT,
@@ -38,7 +39,10 @@ def run_script(script: Path, *args: str) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Local tooling for Cerebro Release 0.1")
-    parser.add_argument("command", choices=sorted((*COMMANDS.keys(), "install")))
+    parser.add_argument(
+        "command",
+        choices=sorted((*COMMANDS.keys(), "install")),
+    )
     args = parser.parse_args()
 
     dependency_script = COMMANDS["dependencies"]

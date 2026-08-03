@@ -2,15 +2,17 @@ schema: cerebro-standard/v0.1
 standard:
   id: STD-REPO
   name: Repository Structure Standard
-  version: 0.1.0
+  version: 0.1.1
   status: approved
   authority: authoritative
-  scope: Authoritative placement and ownership of Cerebro Release 0.1 files.
+  scope: Authoritative placement, required components, and preflight integrity of
+    Cerebro Release 0.1.
   consumers:
   - manifest
   - builder
   - validator
   - maintainer
+  - repository-checker
 rules:
 - id: STD-REPO-R001
   statement: cerebro.yaml shall be the release entry manifest in the repository root.
@@ -18,27 +20,25 @@ rules:
   verification:
   - cerebro.yaml exists at repository root.
 - id: STD-REPO-R002
-  statement: Authoritative standards shall reside under standards/ and be registered
-    by standards/standards.yaml.
+  statement: The Builder shall perform repository integrity validation before dependency
+    checks or other build steps.
   priority: critical
   verification:
-  - All registered standard paths exist.
-  - Unregistered authoritative standards are rejected.
+  - Repository is the first builder step.
 - id: STD-REPO-R003
-  statement: Schemas shall reside under schemas/ and tooling implementations under
-    tooling/.
-  priority: high
+  statement: Missing required tooling components shall produce explicit preflight
+    failures before subprocess execution.
+  priority: critical
   verification:
-  - Manifest references follow the repository structure.
+  - Builder lists each missing path and exits non-zero.
 - id: STD-REPO-R004
-  statement: Generated reports and integrity artifacts shall reside under validation/
-    or builds/.
-  priority: normal
-  verification:
-  - Generated artifacts do not overwrite authoritative source files.
-- id: STD-REPO-R005
-  statement: External user launchers may reside outside the repository and shall use
-    explicit configured path resolution.
+  statement: Generated repository integrity reports shall be stored under validation/.
   priority: high
   verification:
-  - External BAT files verify the repository entrypoint path.
+  - repository-report.json and repository-report.txt are generated.
+- id: STD-REPO-R005
+  statement: External BAT launchers may reside outside the repository and shall resolve
+    the repository entrypoint explicitly.
+  priority: high
+  verification:
+  - Launchers verify cerebro_tool.py before execution.

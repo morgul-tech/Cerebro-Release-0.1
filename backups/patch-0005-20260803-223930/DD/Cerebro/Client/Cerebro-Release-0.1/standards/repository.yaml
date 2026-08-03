@@ -1,0 +1,44 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-REPO
+  name: Repository Structure Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Authoritative placement and ownership of Cerebro Release 0.1 files.
+  consumers:
+  - manifest
+  - builder
+  - validator
+  - maintainer
+rules:
+- id: STD-REPO-R001
+  statement: cerebro.yaml shall be the release entry manifest in the repository root.
+  priority: critical
+  verification:
+  - cerebro.yaml exists at repository root.
+- id: STD-REPO-R002
+  statement: Authoritative standards shall reside under standards/ and be registered
+    by standards/standards.yaml.
+  priority: critical
+  verification:
+  - All registered standard paths exist.
+  - Unregistered authoritative standards are rejected.
+- id: STD-REPO-R003
+  statement: Schemas shall reside under schemas/ and tooling implementations under
+    tooling/.
+  priority: high
+  verification:
+  - Manifest references follow the repository structure.
+- id: STD-REPO-R004
+  statement: Generated reports and integrity artifacts shall reside under validation/
+    or builds/.
+  priority: normal
+  verification:
+  - Generated artifacts do not overwrite authoritative source files.
+- id: STD-REPO-R005
+  statement: External user launchers may reside outside the repository and shall use
+    explicit configured path resolution.
+  priority: high
+  verification:
+  - External BAT files verify the repository entrypoint path.

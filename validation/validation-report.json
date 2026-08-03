@@ -63,6 +63,11 @@
       "id": "RV-012",
       "status": "pass",
       "details": "Standards registry and documents valid"
+    },
+    {
+      "id": "RV-013",
+      "status": "pass",
+      "details": "Repository integrity valid"
     }
   ]
 }

@@ -1,0 +1,38 @@
+Cerebro Repository Integrity Report
+===================================
+Root: D:\Cerebro\Client\Cerebro-Release-0.1
+
+[PASS] cerebro.yaml
+[PASS] cerebro_tool.py
+[PASS] core/principles.yaml
+[PASS] core/priorities.yaml
+[PASS] core/terminology.yaml
+[PASS] engines/collaboration
+[PASS] engines/collaboration/module.yaml
+[PASS] engines/context
+[PASS] engines/context/module.yaml
+[PASS] engines/dialog
+[PASS] engines/dialog/module.yaml
+[PASS] engines/presentation-lite
+[PASS] engines/presentation-lite/module.yaml
+[PASS] engines/project-lite
+[PASS] engines/project-lite/module.yaml
+[PASS] engines/quality-lite
+[PASS] engines/quality-lite/module.yaml
+[PASS] requirements.txt
+[PASS] run_tests.py
+[PASS] runtime/activation.yaml
+[PASS] runtime/error-codes.yaml
+[PASS] runtime/lifecycle.yaml
+[PASS] schemas/runtime.schema.yaml
+[PASS] schemas/standard-document.schema.yaml
+[PASS] standards/standards.yaml
+[PASS] tooling/builder/build_release.py
+[PASS] tooling/dependencies/check_dependencies.py
+[PASS] tooling/patch/install_patch.py
+[PASS] tooling/repository/check_repository.py
+[PASS] tooling/standards/validate_standards.py
+[PASS] tooling/validator/validate.py
+[PASS] validation/release-criteria.yaml
+
+RESULT: PASS

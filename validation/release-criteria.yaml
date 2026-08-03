@@ -33,4 +33,10 @@ criteria:
   - id: RV-011
     name: integrity_manifest
     required: true
+  - id: RV-012
+    name: standards_registry_and_schema
+    required: true
+  - id: RV-013
+    name: repository_integrity
+    required: true
 release_rule: all_required_criteria_pass

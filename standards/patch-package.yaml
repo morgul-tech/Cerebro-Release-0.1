@@ -2,61 +2,46 @@ schema: cerebro-standard/v0.1
 standard:
   id: STD-PATCH
   name: Patch Package Standard
-  version: 0.1.0
+  version: 0.1.2
   status: approved
   authority: authoritative
-  scope: Structure, installation guidance, traceability, and validation requirements
-    for Cerebro patch packages.
+  scope: Portable, self-installing, traceable, and verifiable Cerebro patch packages.
   consumers:
   - builder
   - packager
   - validator
   - maintainer
+  - patch-installer
 rules:
 - id: STD-PATCH-R001
-  statement: Every patch package shall contain PATCH_INSTALL.txt in the package root.
+  statement: Every installable patch shall contain INSTALL_PATCH.bat, installer/patch_installer.py,
+    and installer/locate_cerebro.py.
   priority: critical
   verification:
-  - PATCH_INSTALL.txt exists.
-  - The file is plain UTF-8 text and opens without Markdown tooling.
+  - All three files exist in the patch package.
 - id: STD-PATCH-R002
-  statement: Every patch package shall contain PATCH_CHANGELOG.txt in the package
-    root.
-  priority: high
+  statement: The installer shall support repository discovery and shall not require
+    hardcoded command-line paths.
+  priority: critical
   verification:
-  - PATCH_CHANGELOG.txt exists.
-  - Added, replaced, removed, and unchanged scope are stated.
+  - INSTALL_PATCH.bat invokes the installer without repository arguments.
+  - The locator resolves or prompts for paths.
 - id: STD-PATCH-R003
-  statement: Every patch package shall contain PATCH_MANIFEST.yaml in the package
-    root.
-  priority: critical
+  statement: Resolved local paths shall be stored outside the repository as local
+    user configuration.
+  priority: high
   verification:
-  - PATCH_MANIFEST.yaml parses as YAML.
-  - Every payload file is registered with operation and destination.
+  - Settings are stored under LOCALAPPDATA/Cerebro/settings.json.
 - id: STD-PATCH-R004
-  statement: PATCH_INSTALL.txt shall be sufficient to install the patch without external
-    conversation history.
-  priority: critical
+  statement: Manual path entry shall remain available when automatic discovery fails.
+  priority: high
   verification:
-  - Source and destination are explicit for every file.
-  - Installation order and verification steps are explicit.
+  - Interactive prompt validates cerebro.yaml and cerebro_tool.py.
 - id: STD-PATCH-R005
-  statement: Patch payload shall be separated from patch-only documentation.
-  priority: high
-  verification:
-  - Repository files are under repo/.
-  - External files are under external/ or a named external target folder.
-- id: STD-PATCH-R006
-  statement: Generated files shall not be distributed for manual replacement when
-    an authoritative generator exists.
+  statement: Source and destination checksums, backup, and post-install verification
+    remain mandatory.
   priority: critical
   verification:
-  - Generated files are excluded or explicitly marked generated.
-  - The installation guide names the generator command.
-- id: STD-PATCH-R007
-  statement: A patch is not integrated until the target repository has been read back
-    and verified.
-  priority: high
-  verification:
-  - Post-install verification is documented.
-  - Integration status is recorded as PASS or FAIL.
+  - All payload hashes are checked before and after copying.
+  - Replaced files are backed up.
+  - Manifest verification commands run.

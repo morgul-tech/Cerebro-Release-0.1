@@ -1,0 +1,62 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-PATCH
+  name: Patch Package Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Structure, installation guidance, traceability, and validation requirements
+    for Cerebro patch packages.
+  consumers:
+  - builder
+  - packager
+  - validator
+  - maintainer
+rules:
+- id: STD-PATCH-R001
+  statement: Every patch package shall contain PATCH_INSTALL.txt in the package root.
+  priority: critical
+  verification:
+  - PATCH_INSTALL.txt exists.
+  - The file is plain UTF-8 text and opens without Markdown tooling.
+- id: STD-PATCH-R002
+  statement: Every patch package shall contain PATCH_CHANGELOG.txt in the package
+    root.
+  priority: high
+  verification:
+  - PATCH_CHANGELOG.txt exists.
+  - Added, replaced, removed, and unchanged scope are stated.
+- id: STD-PATCH-R003
+  statement: Every patch package shall contain PATCH_MANIFEST.yaml in the package
+    root.
+  priority: critical
+  verification:
+  - PATCH_MANIFEST.yaml parses as YAML.
+  - Every payload file is registered with operation and destination.
+- id: STD-PATCH-R004
+  statement: PATCH_INSTALL.txt shall be sufficient to install the patch without external
+    conversation history.
+  priority: critical
+  verification:
+  - Source and destination are explicit for every file.
+  - Installation order and verification steps are explicit.
+- id: STD-PATCH-R005
+  statement: Patch payload shall be separated from patch-only documentation.
+  priority: high
+  verification:
+  - Repository files are under repo/.
+  - External files are under external/ or a named external target folder.
+- id: STD-PATCH-R006
+  statement: Generated files shall not be distributed for manual replacement when
+    an authoritative generator exists.
+  priority: critical
+  verification:
+  - Generated files are excluded or explicitly marked generated.
+  - The installation guide names the generator command.
+- id: STD-PATCH-R007
+  statement: A patch is not integrated until the target repository has been read back
+    and verified.
+  priority: high
+  verification:
+  - Post-install verification is documented.
+  - Integration status is recorded as PASS or FAIL.
