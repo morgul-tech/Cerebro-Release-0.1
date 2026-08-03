@@ -68,6 +68,11 @@
       "id": "RV-013",
       "status": "pass",
       "details": "Repository integrity valid"
+    },
+    {
+      "id": "RV-014",
+      "status": "pass",
+      "details": "Cerebro Source 1.0 is the sole registered authority"
     }
   ]
 }

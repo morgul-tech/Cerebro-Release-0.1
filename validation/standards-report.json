@@ -7,9 +7,11 @@
     "standards/builder-pipeline.yaml",
     "standards/naming.yaml",
     "standards/patch-package.yaml",
+    "standards/publication-gate.yaml",
     "standards/release.yaml",
     "standards/report.yaml",
     "standards/repository.yaml",
+    "standards/source-authority.yaml",
     "standards/tooling.yaml",
     "standards/validation.yaml"
   ],

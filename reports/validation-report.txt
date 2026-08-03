@@ -16,5 +16,6 @@ Result: PASS
 [PASS   ] RV-011: Integrity manifest verified
 [PASS   ] RV-012: Standards registry and documents valid
 [PASS   ] RV-013: Repository integrity valid
+[PASS   ] RV-014: Cerebro Source 1.0 is the sole registered authority
 
 Failed required checks: None
