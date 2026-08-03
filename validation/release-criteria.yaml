@@ -39,4 +39,7 @@ criteria:
   - id: RV-013
     name: repository_integrity
     required: true
+  - id: RV-014
+    name: source_authority
+    required: true
 release_rule: all_required_criteria_pass

@@ -21,6 +21,7 @@ COMMANDS = {
     "dependencies": ROOT / "tooling/dependencies/check_dependencies.py",
     "patch-build": ROOT / "tooling/patch/build_patch.py",
     "patch-validate": ROOT / "tooling/patch/validate_patch.py",
+    "quality": ROOT / "tooling/quality/quality_gate.py",
 }
 
 DEPENDENCY_REQUIRED = set(COMMANDS) - {"dependencies"}
@@ -42,15 +43,13 @@ def main() -> int:
     parser.add_argument("arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
-    dependency_script = COMMANDS["dependencies"]
-
     if args.command == "install":
-        return run_script(dependency_script, "install")
+        return run_script(COMMANDS["dependencies"], "install")
 
     if args.command in DEPENDENCY_REQUIRED:
-        dependency_result = run_script(dependency_script, "check")
-        if dependency_result != 0:
-            return dependency_result
+        status = run_script(COMMANDS["dependencies"], "check")
+        if status != 0:
+            return status
 
     return run_script(COMMANDS[args.command], *args.arguments)
 

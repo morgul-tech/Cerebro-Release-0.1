@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import shutil
 import subprocess
 import sys
@@ -13,7 +14,6 @@ from typing import Any
 import yaml
 
 EXIT_OK = 0
-EXIT_USAGE = 2
 EXIT_INSTALL = 6
 
 HERE = Path(__file__).resolve().parent
@@ -24,11 +24,7 @@ from locate_cerebro import resolve
 
 
 def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def load_manifest(path: Path) -> dict[str, Any]:
@@ -38,72 +34,72 @@ def load_manifest(path: Path) -> dict[str, Any]:
     return data
 
 
-def resolve_destination(raw: str, repository_root: Path, scripts_root: Path) -> Path:
-    normalized = raw.replace("\\", "/")
-    if normalized.startswith("{REPOSITORY_ROOT}/"):
-        return repository_root / normalized.removeprefix("{REPOSITORY_ROOT}/")
-    if normalized.startswith("{SCRIPTS_ROOT}/"):
-        return scripts_root / normalized.removeprefix("{SCRIPTS_ROOT}/")
-    raise ValueError(f"Unsupported destination root: {raw}")
+def resolve_destination(raw: str, repo: Path, scripts: Path) -> Path:
+    value = raw.replace("\\", "/")
+    if value.startswith("{REPOSITORY_ROOT}/"):
+        return repo / value.removeprefix("{REPOSITORY_ROOT}/")
+    if value.startswith("{SCRIPTS_ROOT}/"):
+        return scripts / value.removeprefix("{SCRIPTS_ROOT}/")
+    raise ValueError(f"Unsupported destination: {raw}")
 
 
-def verify_sources(patch_root: Path, files: list[dict[str, Any]]) -> None:
+def verify_sources(root: Path, files: list[dict[str, Any]]) -> None:
     failures = []
     for item in files:
-        source = patch_root / item["source"]
+        source = root / item["source"]
         if not source.is_file():
             failures.append(f"Missing source: {item['source']}")
-            continue
-        actual = sha256(source)
-        if item.get("sha256") and actual != item["sha256"]:
+        elif sha256(source) != item["sha256"]:
             failures.append(f"Checksum mismatch: {item['source']}")
     if failures:
         raise RuntimeError("\n".join(failures))
 
 
-def backup_existing(destinations: list[Path], backup_root: Path) -> None:
-    for destination in destinations:
-        if destination.is_file():
-            safe_name = destination.drive.replace(":", "") + destination.as_posix().replace(":", "")
-            backup = backup_root / safe_name.lstrip("/")
-            backup.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(destination, backup)
-
-
 def install_files(
-    patch_root: Path,
-    repository_root: Path,
-    scripts_root: Path,
+    root: Path,
+    repo: Path,
+    scripts: Path,
     manifest: dict[str, Any],
 ) -> list[Path]:
-    files = manifest.get("files", [])
-    destinations = [
-        resolve_destination(item["destination"], repository_root, scripts_root)
-        for item in files
+    targets = [
+        resolve_destination(item["destination"], repo, scripts)
+        for item in manifest["files"]
     ]
 
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    backup_root = repository_root / "backups" / f"patch-{manifest['patch']['id']}-{timestamp}"
-    backup_existing(destinations, backup_root)
+    local_app_data = Path(os.environ.get("LOCALAPPDATA", Path.home()))
+    backup = (
+        local_app_data
+        / "Cerebro"
+        / "backups"
+        / f"patch-{manifest['patch']['id']}-{datetime.now():%Y%m%d-%H%M%S}"
+    )
 
-    installed: list[Path] = []
-    for item, destination in zip(files, destinations):
-        source = patch_root / item["source"]
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
-        if sha256(destination) != item["sha256"]:
-            raise RuntimeError(f"Post-copy checksum mismatch: {destination}")
-        installed.append(destination)
+    for target in targets:
+        if target.is_file():
+            try:
+                relative = target.relative_to(repo)
+                saved = backup / "repository" / relative
+            except ValueError:
+                saved = backup / "external" / target.name
+            saved.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(target, saved)
 
+    installed = []
+    for item, target in zip(manifest["files"], targets):
+        source = root / item["source"]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+        if sha256(target) != item["sha256"]:
+            raise RuntimeError(f"Post-copy checksum mismatch: {target}")
+        installed.append(target)
     return installed
 
 
-def run_verification(repository_root: Path, commands: list[list[str]]) -> None:
+def run_verification(repo: Path, commands: list[list[str]]) -> None:
     for command in commands:
         resolved = [sys.executable if token == "{PYTHON}" else token for token in command]
-        print()
-        print("VERIFY:", " ".join(resolved))
-        result = subprocess.run(resolved, cwd=repository_root)
+        print("\nVERIFY:", " ".join(resolved))
+        result = subprocess.run(resolved, cwd=repo)
         if result.returncode != 0:
             raise RuntimeError(
                 f"Verification failed with exit code {result.returncode}: "
@@ -111,42 +107,83 @@ def run_verification(repository_root: Path, commands: list[list[str]]) -> None:
             )
 
 
+def run_quality_gate(root: Path, repo: Path) -> None:
+    gate = repo / "tooling" / "quality" / "quality_gate.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(gate),
+            "--patch-root",
+            str(root),
+        ],
+        cwd=repo,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Quality Gate blocked publication with exit code {result.returncode}."
+        )
+
+
+def publish(root: Path, repo: Path) -> None:
+    publisher = root / "installer" / "repository_publisher.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(publisher),
+            "--repository-root",
+            str(repo),
+            "--manifest",
+            str(root / "PATCH_MANIFEST.yaml"),
+        ],
+        cwd=repo,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Publication Gate failed with exit code {result.returncode}."
+        )
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Install a Cerebro patch package")
+    parser = argparse.ArgumentParser(description="Install a Cerebro patch")
     parser.add_argument("--patch-root", default=str(Path(__file__).resolve().parents[1]))
     parser.add_argument("--repository-root")
     parser.add_argument("--scripts-root")
     parser.add_argument("--non-interactive", action="store_true")
+    parser.add_argument("--install-only", action="store_true")
     args = parser.parse_args()
 
-    patch_root = Path(args.patch_root).resolve()
-    manifest_path = patch_root / "PATCH_MANIFEST.yaml"
+    root = Path(args.patch_root).resolve()
 
     try:
         if args.repository_root and args.scripts_root:
-            repository_root = Path(args.repository_root).resolve()
-            scripts_root = Path(args.scripts_root).resolve()
+            repo = Path(args.repository_root).resolve()
+            scripts = Path(args.scripts_root).resolve()
         else:
-            repository_root, scripts_root = resolve(interactive=not args.non_interactive)
+            repo, scripts = resolve(interactive=not args.non_interactive)
 
-        print(f"[PASS] Repository: {repository_root}")
-        print(f"[PASS] Scripts: {scripts_root}")
+        print(f"[PASS] Repository: {repo}")
+        print(f"[PASS] Scripts: {scripts}")
 
-        manifest = load_manifest(manifest_path)
-        verify_sources(patch_root, manifest.get("files", []))
-        installed = install_files(
-            patch_root, repository_root, scripts_root, manifest
-        )
-        run_verification(repository_root, manifest.get("verification", []))
+        manifest = load_manifest(root / "PATCH_MANIFEST.yaml")
+        verify_sources(root, manifest["files"])
+        installed = install_files(root, repo, scripts, manifest)
+        run_verification(repo, manifest.get("verification", []))
+
+        if not args.install_only:
+            run_quality_gate(root, repo)
+            publish(root, repo)
     except Exception as exc:
-        print()
-        print("[FAIL] Patch installation failed.")
+        print("\n[FAIL] Patch operation failed.")
         print(exc)
         return EXIT_INSTALL
 
-    print()
-    print("[PASS] Patch installation completed.")
+    print("\n[PASS] Patch operation completed.")
     print(f"Installed files: {len(installed)}")
+    print(
+        "[INFO] Install-only mode completed."
+        if args.install_only
+        else "[PASS] Quality Gate and repository update verified."
+    )
     return EXIT_OK
 
 

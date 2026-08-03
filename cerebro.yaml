@@ -1,4 +1,10 @@
 schema: cerebro-release/v0.1
+source_authority:
+  identity: Cerebro Source 1.0
+  authority: sole
+  declaration: standards/source-authority.yaml
+  source_folder_required: false
+  implementation_authoritative: false
 release:
   name: Cerebro
   version: 0.1.0

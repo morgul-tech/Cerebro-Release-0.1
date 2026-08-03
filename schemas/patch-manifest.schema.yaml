@@ -1,6 +1,5 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: cerebro-patch-manifest/v0.1
-title: Cerebro Patch Manifest
 type: object
 additionalProperties: false
 required:
@@ -8,6 +7,7 @@ required:
 - patch
 - files
 - verification
+- publication
 properties:
   schema:
     const: cerebro-patch-manifest/v0.1
@@ -25,50 +25,53 @@ properties:
         pattern: ^[0-9]{4}[A-Z]?$
       name:
         type: string
-        minLength: 1
       target:
         type: string
-        minLength: 1
       prerequisite:
         type: array
-        uniqueItems: true
         items:
           type: string
       includes:
         type: array
-        uniqueItems: true
         items:
           type: string
   files:
     type: array
-    minItems: 1
-    items:
-      type: object
-      additionalProperties: false
-      required:
-      - source
-      - destination
-      - operation
-      - sha256
-      properties:
-        source:
-          type: string
-          pattern: ^repo/.+
-        destination:
-          type: string
-          pattern: ^\{(REPOSITORY_ROOT|SCRIPTS_ROOT)\}/.+
-        operation:
-          enum:
-          - add
-          - replace
-          - delete
-        sha256:
-          type: string
-          pattern: ^[a-f0-9]{64}$
   verification:
     type: array
-    items:
-      type: array
-      minItems: 1
-      items:
+  publication:
+    type: object
+    additionalProperties: false
+    required:
+    - enabled
+    - require_pipeline_pass
+    - pipeline
+    - remote
+    - branch
+    - commit_message
+    - generated_paths
+    - repository_url
+    properties:
+      enabled:
+        const: true
+      require_pipeline_pass:
+        const: true
+      pipeline:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      remote:
         type: string
+      branch:
+        type: string
+        minLength: 1
+      commit_message:
+        type: string
+      generated_paths:
+        type: array
+        items:
+          type: string
+      repository_url:
+        type: string
+        pattern: ^https://github\.com/.+\.git$

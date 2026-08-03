@@ -12,9 +12,6 @@ results: list[dict[str, Any]] = []
 def result(cid: str, status: str, details: str) -> None:
     results.append({"id": cid, "status": status, "details": details})
 
-def load(path: str) -> Any:
-    return yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
-
 parse_errors=[]; docs={}
 for p in sorted(ROOT.rglob("*.yaml")):
     try: docs[str(p.relative_to(ROOT)).replace("\\", "/")]=yaml.safe_load(p.read_text(encoding="utf-8"))
@@ -26,6 +23,9 @@ missing=[]
 for section in ("runtime","core","standards"):
     for path in manifest.get(section,{}).values():
         if not (ROOT/path).exists(): missing.append(path)
+source_declaration=manifest.get("source_authority",{}).get("declaration")
+if source_declaration and not (ROOT/source_declaration).exists():
+    missing.append(source_declaration)
 for eng in manifest.get("engines",[]):
     p=ROOT/eng["path"]
     if not p.is_dir(): missing.append(eng["path"])
@@ -119,6 +119,28 @@ result("RV-012","pass" if standards_proc.returncode==0 else "fail","Standards re
 
 repository_proc=subprocess.run([sys.executable,str(ROOT/"tooling/repository/check_repository.py")],cwd=ROOT,text=True,capture_output=True)
 result("RV-013","pass" if repository_proc.returncode==0 else "fail","Repository integrity valid" if repository_proc.returncode==0 else (repository_proc.stdout+repository_proc.stderr)[-2000:])
+
+source=manifest.get("source_authority",{})
+source_registry=docs.get("standards/standards.yaml",{})
+registered_source=any(
+    item.get("id")=="STD-SOURCE" and item.get("path")=="standards/source-authority.yaml" and item.get("required") is True
+    for item in source_registry.get("documents",[])
+)
+source_errors=[]
+if source.get("identity")!="Cerebro Source 1.0": source_errors.append("identity")
+if source.get("authority")!="sole": source_errors.append("authority")
+if source.get("declaration")!="standards/source-authority.yaml": source_errors.append("declaration")
+if source.get("source_folder_required") is not False: source_errors.append("source_folder_required")
+if source.get("implementation_authoritative") is not False: source_errors.append("implementation_authoritative")
+if not registered_source: source_errors.append("STD-SOURCE registration")
+if (ROOT/"Source").exists() or (ROOT/"source").exists(): source_errors.append("forbidden Source folder")
+result(
+    "RV-014",
+    "pass" if not source_errors else "fail",
+    "Cerebro Source 1.0 is the sole registered authority"
+    if not source_errors
+    else f"Source authority errors: {source_errors}"
+)
 
 required={c["id"] for c in docs.get("validation/release-criteria.yaml",{}).get("criteria",[]) if c.get("required")}
 failed=[r["id"] for r in results if r["id"] in required and r["status"]!="pass"]
