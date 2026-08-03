@@ -1,0 +1,43 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-VALID
+  name: Validation Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Rules for deterministic validation and maturity claims.
+  consumers:
+  - validator
+  - builder
+  - release-manager
+rules:
+- id: STD-VALID-R001
+  statement: No artifact shall claim a maturity level higher than its completed validation
+    supports.
+  priority: critical
+  verification:
+  - Release status matches validation outcome.
+- id: STD-VALID-R002
+  statement: All required release criteria shall pass before release status may be
+    assigned.
+  priority: critical
+  verification:
+  - failed_required is empty.
+  - Release rule is all_required_criteria_pass.
+- id: STD-VALID-R003
+  statement: Standards documents shall be schema-valid, uniquely identified, and fully
+    registered.
+  priority: critical
+  verification:
+  - Standards validation passes.
+- id: STD-VALID-R004
+  statement: Validation shall be reproducible from repository contents without conversation
+    history.
+  priority: critical
+  verification:
+  - All required criteria and rules are stored in files.
+- id: STD-VALID-R005
+  statement: Integrity data shall be regenerated after authoritative file changes.
+  priority: high
+  verification:
+  - Checksum generation precedes final validation.

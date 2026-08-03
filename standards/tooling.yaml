@@ -1,0 +1,49 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-TOOL
+  name: Tooling Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Responsibilities and constraints for local Cerebro support tooling.
+  consumers:
+  - builder
+  - validator
+  - packager
+  - reporter
+  - dependency-manager
+rules:
+- id: STD-TOOL-R001
+  statement: Cerebro tooling shall run locally and shall not require an external service
+    for core operation.
+  priority: critical
+  verification:
+  - Core commands run with local files and local Python.
+  - Network access is not required after dependencies are installed.
+- id: STD-TOOL-R002
+  statement: Python tooling is a replaceable implementation and is not an authoritative
+    policy source.
+  priority: critical
+  verification:
+  - Authoritative rules are stored in YAML or schemas.
+  - Python reads rather than redefines policy where practical.
+- id: STD-TOOL-R003
+  statement: Tooling commands shall fail explicitly and return stable exit codes.
+  priority: critical
+  verification:
+  - Success returns 0.
+  - Missing dependencies return 3.
+  - Validation and test failures return non-zero.
+- id: STD-TOOL-R004
+  statement: Dependency installation shall be an explicit user-selected action.
+  priority: high
+  verification:
+  - Build never installs dependencies automatically.
+  - Install is exposed as a separate command.
+- id: STD-TOOL-R005
+  statement: Generated artifacts shall identify their generator and shall not be edited
+    manually.
+  priority: high
+  verification:
+  - Reports and checksums are generated.
+  - Documentation marks generated outputs.

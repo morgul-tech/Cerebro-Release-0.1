@@ -1,0 +1,36 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-REPORT
+  name: Report Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Machine-readable and human-readable reporting for validation and tooling.
+  consumers:
+  - validator
+  - reporter
+  - dependency-manager
+  - builder
+rules:
+- id: STD-REPORT-R001
+  statement: Validation outcomes shall be available in machine-readable JSON.
+  priority: critical
+  verification:
+  - validation-report.json is generated.
+- id: STD-REPORT-R002
+  statement: User-facing operational reports shall also be available as plain text
+    when practical.
+  priority: high
+  verification:
+  - A TXT report is generated for dependency and build-facing results.
+- id: STD-REPORT-R003
+  statement: Reports shall identify result, failed required checks, and relevant evidence.
+  priority: critical
+  verification:
+  - PASS or FAIL is explicit.
+  - Failed check identifiers are listed.
+- id: STD-REPORT-R004
+  statement: Generated reports shall not be authoritative inputs to runtime behavior.
+  priority: high
+  verification:
+  - Reports are outputs only.

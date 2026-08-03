@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent
 COMMANDS = {
     "test": ROOT / "tooling/tests/run_tests.py",
     "validate": ROOT / "tooling/validator/validate.py",
+    "standards": ROOT / "tooling/standards/validate_standards.py",
     "report": ROOT / "tooling/reporter/generate_report.py",
     "checksum": ROOT / "tooling/integrity/generate_checksums.py",
     "zip": ROOT / "tooling/packager/create_zip.py",
@@ -21,6 +22,7 @@ COMMANDS = {
 DEPENDENCY_REQUIRED = {
     "test",
     "validate",
+    "standards",
     "report",
     "checksum",
     "zip",

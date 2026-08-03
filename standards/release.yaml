@@ -1,0 +1,46 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-RELEASE
+  name: Release Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Status, build, validation, and packaging requirements for Cerebro releases.
+  consumers:
+  - builder
+  - validator
+  - packager
+  - release-manager
+rules:
+- id: STD-RELEASE-R001
+  statement: A release candidate shall be a built artifact that has passed all configured
+    required validation criteria.
+  priority: critical
+  verification:
+  - Validation report result is pass.
+  - Manifest status is release-candidate.
+- id: STD-RELEASE-R002
+  statement: A final release shall require an explicit promotion action beyond release-candidate
+    validation.
+  priority: critical
+  verification:
+  - Release promotion is separately recorded.
+- id: STD-RELEASE-R003
+  statement: Build order shall be deterministic and shall stop at the first failed
+    required step.
+  priority: critical
+  verification:
+  - Builder step order is fixed.
+  - Non-zero step result stops the build.
+- id: STD-RELEASE-R004
+  statement: Release packages shall exclude caches, temporary files, local settings,
+    and prior build outputs.
+  priority: high
+  verification:
+  - Packager exclusions are configured.
+- id: STD-RELEASE-R005
+  statement: Release identity and status shall be consistent across manifest, README,
+    reports, and package naming.
+  priority: high
+  verification:
+  - Status consistency validation passes.

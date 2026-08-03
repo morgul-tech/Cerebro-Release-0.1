@@ -58,6 +58,11 @@
       "id": "RV-011",
       "status": "pass",
       "details": "Integrity manifest verified"
+    },
+    {
+      "id": "RV-012",
+      "status": "pass",
+      "details": "Standards registry and documents valid"
     }
   ]
 }

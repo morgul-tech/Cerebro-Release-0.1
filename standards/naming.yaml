@@ -1,0 +1,33 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-NAME
+  name: Naming Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Consistent naming for standards, patches, commands, files, and identifiers.
+  consumers:
+  - all-components
+rules:
+- id: STD-NAME-R001
+  statement: Standard identifiers shall use STD-<DOMAIN> and rule identifiers shall
+    append -RNNN.
+  priority: high
+  verification:
+  - Identifiers match the standard schema.
+- id: STD-NAME-R002
+  statement: Patch identifiers shall use zero-padded four-digit numbers.
+  priority: high
+  verification:
+  - Examples use 0001, 0002, and 0003.
+- id: STD-NAME-R003
+  statement: Technical commands and repository file names shall use stable English
+    names.
+  priority: normal
+  verification:
+  - CLI commands match registered command names.
+- id: STD-NAME-R004
+  statement: Plain-text patch documentation shall use uppercase fixed names.
+  priority: high
+  verification:
+  - PATCH_INSTALL.txt and PATCH_CHANGELOG.txt are used exactly.

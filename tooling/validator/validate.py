@@ -19,14 +19,14 @@ def load(path: str) -> Any:
 parse_errors=[]
 docs={}
 for p in sorted(ROOT.rglob("*.yaml")):
-    try: docs[str(p.relative_to(ROOT))]=yaml.safe_load(p.read_text(encoding="utf-8"))
+    try: docs[str(p.relative_to(ROOT)).replace("\\", "/")]=yaml.safe_load(p.read_text(encoding="utf-8"))
     except Exception as exc: parse_errors.append(f"{p.relative_to(ROOT)}: {exc}")
 result("RV-001", "pass" if not parse_errors else "fail", "All YAML parsed" if not parse_errors else "; ".join(parse_errors))
 
 manifest=docs.get("cerebro.yaml", {})
 # RV-002
 missing=[]
-for section in ("runtime","core"):
+for section in ("runtime","core","standards"):
     for path in manifest.get(section,{}).values():
         if not (ROOT/path).exists(): missing.append(path)
 for eng in manifest.get("engines",[]):
@@ -100,7 +100,7 @@ expected={f"AC-{i:03d}" for i in range(1,11)}
 missing_scenarios=sorted(expected-ids)
 result("RV-008", "pass" if not missing_scenarios else "fail", f"{len(scenarios)} acceptance scenarios declared" if not missing_scenarios else f"Missing: {missing_scenarios}")
 
-# RV-009 executable acceptance tests
+# RV-009
 executables=list((ROOT/"tests").rglob("test_*.py")) + list((ROOT/"tests").rglob("*.spec.*"))
 if executables:
     proc=subprocess.run([sys.executable, "run_tests.py"], cwd=ROOT, text=True, capture_output=True)
@@ -109,7 +109,7 @@ if executables:
 else:
     result("RV-009", "fail", "Acceptance scenarios are declarative only")
 
-# RV-010 replay-based determinism
+# RV-010
 try:
     sys.path.insert(0, str(ROOT))
     from cerebro_runtime import CerebroRuntime
@@ -122,7 +122,7 @@ try:
 except Exception as exc:
     result("RV-010", "fail", f"Determinism replay failed: {exc}")
 
-# RV-011 integrity manifest
+# RV-011
 integrity_path=ROOT/"validation/integrity.sha256"
 if integrity_path.exists():
     expected_hashes={}
@@ -138,6 +138,20 @@ if integrity_path.exists():
 else:
     status="fail"; details="Missing validation/integrity.sha256"
 result("RV-011",status,details)
+
+# RV-012
+standards_proc=subprocess.run(
+    [sys.executable, str(ROOT/"tooling/standards/validate_standards.py")],
+    cwd=ROOT, text=True, capture_output=True
+)
+standards_ok=standards_proc.returncode == 0
+result(
+    "RV-012",
+    "pass" if standards_ok else "fail",
+    "Standards registry and documents valid"
+    if standards_ok
+    else (standards_proc.stdout + standards_proc.stderr)[-2000:]
+)
 
 required={c["id"] for c in docs.get("validation/release-criteria.yaml",{}).get("criteria",[]) if c.get("required")}
 failed=[r["id"] for r in results if r["id"] in required and r["status"]!="pass"]

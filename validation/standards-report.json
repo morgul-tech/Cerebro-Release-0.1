@@ -1,0 +1,16 @@
+{
+  "schema": "cerebro-standards-report/v0.1",
+  "result": "pass",
+  "manifest": "standards/standards.yaml",
+  "validated": [
+    "standards/bat-launcher.yaml",
+    "standards/naming.yaml",
+    "standards/patch-package.yaml",
+    "standards/release.yaml",
+    "standards/report.yaml",
+    "standards/repository.yaml",
+    "standards/tooling.yaml",
+    "standards/validation.yaml"
+  ],
+  "errors": []
+}

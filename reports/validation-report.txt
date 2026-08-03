@@ -14,5 +14,6 @@ Result: PASS
 [PASS   ] RV-009: 10 executable acceptance tests passed
 [PASS   ] RV-010: Replay hashes are equivalent
 [PASS   ] RV-011: Integrity manifest verified
+[PASS   ] RV-012: Standards registry and documents valid
 
 Failed required checks: None

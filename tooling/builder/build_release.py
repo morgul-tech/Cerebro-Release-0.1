@@ -13,6 +13,7 @@ from tooling.common.paths import ROOT
 
 STEPS = [
     ("Environment", ROOT / "tooling/dependencies/check_dependencies.py", ["check"]),
+    ("Standards", ROOT / "tooling/standards/validate_standards.py", []),
     ("Tests", ROOT / "tooling/tests/run_tests.py", []),
     ("Checksums", ROOT / "tooling/integrity/generate_checksums.py", []),
     ("Validation", ROOT / "tooling/validator/validate.py", []),

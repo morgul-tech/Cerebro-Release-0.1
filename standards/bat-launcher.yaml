@@ -1,0 +1,56 @@
+schema: cerebro-standard/v0.1
+standard:
+  id: STD-BAT
+  name: Windows BAT Launcher Standard
+  version: 0.1.0
+  status: approved
+  authority: authoritative
+  scope: Thin Windows launchers for local Cerebro tooling.
+  consumers:
+  - launcher-author
+  - builder
+  - validator
+rules:
+- id: STD-BAT-R001
+  statement: BAT launchers shall contain no authoritative business, validation, or
+    build logic.
+  priority: critical
+  verification:
+  - Launcher delegates to cerebro_tool.py.
+  - No YAML parsing, checksum generation, or packaging logic exists in BAT.
+- id: STD-BAT-R002
+  statement: Each BAT launcher shall invoke exactly one Cerebro CLI command.
+  priority: high
+  verification:
+  - One command token is passed to cerebro_tool.py.
+- id: STD-BAT-R003
+  statement: Launchers shall resolve the configured Cerebro repository path before
+    execution.
+  priority: critical
+  verification:
+  - cerebro_tool.py existence is checked.
+  - Failure reports the expected path.
+- id: STD-BAT-R004
+  statement: Python resolution order shall be py, then python, then explicit failure.
+  priority: high
+  verification:
+  - py is checked first.
+  - python is checked second.
+  - Missing Python exits with code 3.
+- id: STD-BAT-R005
+  statement: Launchers shall preserve and return the underlying command exit code.
+  priority: critical
+  verification:
+  - RESULT captures errorlevel.
+  - exit /b returns RESULT.
+- id: STD-BAT-R006
+  statement: Launchers intended for double-click use shall pause after displaying
+    the result.
+  priority: normal
+  verification:
+  - pause appears after PASS or FAIL output.
+- id: STD-BAT-R007
+  statement: Launcher text shall remain ASCII-compatible in Release 0.1.
+  priority: normal
+  verification:
+  - No non-ASCII characters are required for execution or status output.

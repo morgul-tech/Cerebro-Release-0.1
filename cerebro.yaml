@@ -12,6 +12,10 @@ core:
   principles: core/principles.yaml
   terminology: core/terminology.yaml
   priorities: core/priorities.yaml
+standards:
+  manifest: standards/standards.yaml
+  schema: schemas/standard-document.schema.yaml
+  validator: tooling/standards/validate_standards.py
 engines:
   - id: dialog
     path: engines/dialog/

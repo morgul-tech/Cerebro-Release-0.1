@@ -1,0 +1,37 @@
+schema: cerebro-standards-manifest/v0.1
+standards_engine:
+  id: standards
+  version: 0.1.0
+  role: authoritative-policy-registry
+  runtime_engine: false
+  policy_owner: cerebro-source
+  implementation_owner: tooling
+documents:
+- id: STD-PATCH
+  path: standards/patch-package.yaml
+  required: true
+- id: STD-BAT
+  path: standards/bat-launcher.yaml
+  required: true
+- id: STD-TOOL
+  path: standards/tooling.yaml
+  required: true
+- id: STD-REPO
+  path: standards/repository.yaml
+  required: true
+- id: STD-REPORT
+  path: standards/report.yaml
+  required: true
+- id: STD-NAME
+  path: standards/naming.yaml
+  required: true
+- id: STD-VALID
+  path: standards/validation.yaml
+  required: true
+- id: STD-RELEASE
+  path: standards/release.yaml
+  required: true
+governance:
+  policy_over_implementation: true
+  single_source_of_truth: true
+  unregistered_standards_authoritative: false
