@@ -1,0 +1,74 @@
+{
+  "schema": "cerebro-builder-pipeline-report/v0.1",
+  "pipeline": "release",
+  "started_utc": "2026-08-03T20:55:41.405088+00:00",
+  "result": "pass",
+  "failed_stage": null,
+  "stages": [
+    {
+      "id": "BP-001",
+      "name": "Repository Audit",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-002",
+      "name": "Dependency Check",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-003",
+      "name": "Standards Validation",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-004",
+      "name": "Tests",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-005",
+      "name": "Integrity Generation",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-006",
+      "name": "Release Validation",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-007",
+      "name": "Human Report",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    },
+    {
+      "id": "BP-008",
+      "name": "Release Packaging",
+      "required": true,
+      "status": "pass",
+      "exit_code": 0,
+      "details": "Exit code 0"
+    }
+  ],
+  "finished_utc": "2026-08-03T20:55:44.078019+00:00"
+}

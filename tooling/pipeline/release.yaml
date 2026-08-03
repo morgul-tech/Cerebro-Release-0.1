@@ -1,0 +1,49 @@
+schema: cerebro-builder-pipeline/v0.1
+pipeline:
+  id: release
+  version: 1.0.0
+  fail_fast: true
+  report: validation/builder-pipeline-report.json
+stages:
+- id: BP-001
+  name: Repository Audit
+  script: tooling/repository/check_repository.py
+  required: true
+  enabled: true
+- id: BP-002
+  name: Dependency Check
+  script: tooling/dependencies/check_dependencies.py
+  arguments:
+  - check
+  required: true
+  enabled: true
+- id: BP-003
+  name: Standards Validation
+  script: tooling/standards/validate_standards.py
+  required: true
+  enabled: true
+- id: BP-004
+  name: Tests
+  script: tooling/tests/run_tests.py
+  required: true
+  enabled: true
+- id: BP-005
+  name: Integrity Generation
+  script: tooling/integrity/generate_checksums.py
+  required: true
+  enabled: true
+- id: BP-006
+  name: Release Validation
+  script: tooling/validator/validate.py
+  required: true
+  enabled: true
+- id: BP-007
+  name: Human Report
+  script: tooling/reporter/generate_report.py
+  required: true
+  enabled: true
+- id: BP-008
+  name: Release Packaging
+  script: tooling/packager/create_zip.py
+  required: true
+  enabled: true

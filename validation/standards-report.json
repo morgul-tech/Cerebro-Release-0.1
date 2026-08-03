@@ -4,6 +4,7 @@
   "manifest": "standards/standards.yaml",
   "validated": [
     "standards/bat-launcher.yaml",
+    "standards/builder-pipeline.yaml",
     "standards/naming.yaml",
     "standards/patch-package.yaml",
     "standards/release.yaml",
