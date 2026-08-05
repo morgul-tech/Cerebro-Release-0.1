@@ -4,9 +4,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -14,9 +16,7 @@ import yaml
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORT_DIR = ROOT / "reports" / "quality"
-REPORT_JSON = REPORT_DIR / "quality-report.json"
-REPORT_TXT = REPORT_DIR / "quality-report.txt"
+DEFAULT_REPORT_DIR = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "Cerebro" / "reports" / "quality"
 
 FORBIDDEN_NAMES = {
     "__pycache__",
@@ -40,14 +40,12 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def remove_generated_python_cache() -> None:
-    for path in sorted(ROOT.rglob("__pycache__"), reverse=True):
-        if path.is_dir():
-            shutil.rmtree(path)
-    for suffix in ("*.pyc", "*.pyo"):
-        for path in ROOT.rglob(suffix):
-            if path.is_file():
-                path.unlink()
+def content_snapshot(root: Path) -> dict[str, str]:
+    return {
+        str(path.relative_to(root)).replace("\\", "/"): sha256(path)
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
 
 
 def record(
@@ -193,12 +191,20 @@ def run_command(command: list[str]) -> tuple[bool, str]:
         sys.executable if token == "{PYTHON}" else token
         for token in command
     ]
-    process = subprocess.run(
-        resolved,
-        cwd=ROOT,
-        text=True,
-        capture_output=True,
-    )
+    with tempfile.TemporaryDirectory(prefix="cerebro-quality-") as temp:
+        isolated = Path(temp) / "release"
+        shutil.copytree(
+            ROOT,
+            isolated,
+            ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache", "*.pyc", "*.pyo"),
+        )
+        process = subprocess.run(
+            resolved,
+            cwd=isolated,
+            text=True,
+            capture_output=True,
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+        )
     combined = (process.stdout + process.stderr).strip()
     return process.returncode == 0, combined[-4000:]
 
@@ -285,7 +291,7 @@ def check_approved_paths(
     )
 
 
-def write_reports(checks: list[dict[str, Any]]) -> dict[str, Any]:
+def write_reports(checks: list[dict[str, Any]], report_dir: Path) -> dict[str, Any]:
     failed = [item["id"] for item in checks if item["status"] != "pass"]
     report = {
         "schema": "cerebro-quality-report/v0.1",
@@ -296,8 +302,8 @@ def write_reports(checks: list[dict[str, Any]]) -> dict[str, Any]:
         "checks": checks,
     }
 
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    REPORT_JSON.write_text(
+    report_dir.mkdir(parents=True, exist_ok=True)
+    (report_dir / "quality-report.json").write_text(
         json.dumps(report, indent=2) + "\n",
         encoding="utf-8",
     )
@@ -322,20 +328,20 @@ def write_reports(checks: list[dict[str, Any]]) -> dict[str, Any]:
         "",
     ])
 
-    REPORT_TXT.write_text("\n".join(lines), encoding="utf-8")
+    (report_dir / "quality-report.txt").write_text("\n".join(lines), encoding="utf-8")
     return report
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run the Cerebro Quality Gate")
     parser.add_argument("--patch-root", required=True)
+    parser.add_argument("--report-dir", default=str(DEFAULT_REPORT_DIR))
     args = parser.parse_args()
 
     patch_root = Path(args.patch_root).resolve()
     checks: list[dict[str, Any]] = []
-
-    # Remove only generated Python bytecode/cache artifacts before QA.
-    remove_generated_python_cache()
+    release_before = content_snapshot(ROOT)
+    patch_before = content_snapshot(patch_root)
 
     check_python_syntax(checks)
     check_yaml_json(checks)
@@ -345,7 +351,19 @@ def main() -> int:
     check_pipeline(checks, manifest)
     check_approved_paths(checks, manifest)
 
-    report = write_reports(checks)
+    release_after = content_snapshot(ROOT)
+    patch_after = content_snapshot(patch_root)
+    record(
+        checks,
+        "QG-008",
+        "Observational Gate",
+        release_before == release_after and patch_before == patch_after,
+        "Evaluated Release and patch content remained byte-identical"
+        if release_before == release_after and patch_before == patch_after
+        else "Evaluated content changed during Quality Gate",
+    )
+
+    report = write_reports(checks, Path(args.report_dir).resolve())
     print(json.dumps(report, indent=2))
     return 0 if report["ready_for_publication"] else 9
 

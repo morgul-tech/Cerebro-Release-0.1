@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 INSTALLER = ROOT / "tooling/patch/install_patch.py"
 LOCATOR = ROOT / "tooling/patch/locate_cerebro.py"
 VALIDATOR = ROOT / "tooling/patch/validate_patch.py"
+PUBLISHER = ROOT / "tooling/patch/repository_publisher.py"
 BUILDS = ROOT / "builds" / "patches"
 EXIT_BUILD = 6
 
@@ -18,7 +19,10 @@ def sha256(path: Path) -> str:
 
 def load_plan(path: Path) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    missing = [k for k in ("id", "name", "target", "files") if k not in data]
+    missing = [
+        k for k in ("id", "name", "target", "authoritative", "files", "publication")
+        if k not in data
+    ]
     if missing:
         raise ValueError(f"Missing fields: {missing}")
     return data
@@ -68,9 +72,11 @@ def build(plan_path: Path) -> Path:
 
     shutil.copy2(INSTALLER, work / "installer/patch_installer.py")
     shutil.copy2(LOCATOR, work / "installer/locate_cerebro.py")
+    shutil.copy2(PUBLISHER, work / "installer/repository_publisher.py")
     (work / "INSTALL_PATCH.bat").write_text(bat_content(patch_id), encoding="ascii")
 
     manifest_files = []
+    manifest_baseline = []
     for item in plan["files"]:
         source_rel = str(item["source"]).replace("\\", "/")
         source = ROOT / source_rel
@@ -85,21 +91,43 @@ def build(plan_path: Path) -> Path:
             "operation": item.get("operation", "replace"),
             "sha256": sha256(payload),
         })
+        destination = manifest_files[-1]["destination"]
+        declared_baseline = item.get("baseline")
+        if declared_baseline is not None:
+            baseline_item = {"destination": destination, **declared_baseline}
+        elif destination.startswith("{REPOSITORY_ROOT}/"):
+            relative = destination.removeprefix("{REPOSITORY_ROOT}/")
+            current = ROOT / relative
+            baseline_item = {"destination": destination, "state": "absent"}
+            if current.is_file():
+                baseline_item = {
+                    "destination": destination,
+                    "state": "present",
+                    "sha256": sha256(current),
+                }
+        else:
+            raise ValueError(
+                f"Explicit baseline is required for non-repository destination: {destination}"
+            )
+        manifest_baseline.append(baseline_item)
 
     manifest = {
-        "schema": "cerebro-patch-manifest/v0.1",
+        "schema": "cerebro-patch-manifest/v1.0",
         "patch": {
             "id": patch_id,
             "name": plan["name"],
             "target": plan["target"],
             "prerequisite": plan.get("prerequisite", []),
         },
+        "authoritative": plan["authoritative"],
+        "baseline": manifest_baseline,
         "files": manifest_files,
         "verification": plan.get("verification", [
             ["{PYTHON}", "cerebro_tool.py", "repository"],
             ["{PYTHON}", "cerebro_tool.py", "checksum"],
             ["{PYTHON}", "cerebro_tool.py", "validate"],
         ]),
+        "publication": plan["publication"],
     }
     (work / "PATCH_MANIFEST.yaml").write_text(
         yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8"
