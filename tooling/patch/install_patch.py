@@ -19,7 +19,11 @@ from jsonschema import Draft202012Validator
 
 HERE = Path(__file__).resolve().parent
 RELEASE_ROOT = HERE.parents[1]
-SCHEMA = RELEASE_ROOT / "schemas" / "patch-manifest.schema.yaml"
+SCHEMA_CANDIDATES = (
+    HERE.parent / "schemas" / "patch-manifest.schema.yaml",
+    RELEASE_ROOT / "schemas" / "patch-manifest.schema.yaml",
+)
+SCHEMA = next((path for path in SCHEMA_CANDIDATES if path.is_file()), SCHEMA_CANDIDATES[0])
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 from locate_cerebro import resolve

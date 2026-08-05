@@ -7,7 +7,6 @@ import yaml
 from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[2]
-SCHEMA = ROOT / "schemas" / "patch-manifest.schema.yaml"
 EXIT_OK = 0
 EXIT_VALIDATION = 4
 
@@ -24,6 +23,8 @@ def validate_directory(patch_root: Path) -> dict[str, Any]:
         "INSTALL_PATCH.bat", "PATCH_INSTALL.txt", "PATCH_CHANGELOG.txt",
         "PATCH_MANIFEST.yaml", "installer/patch_installer.py",
         "installer/locate_cerebro.py",
+        "installer/repository_publisher.py",
+        "schemas/patch-manifest.schema.yaml",
     ]
     for relative in required:
         if not (patch_root / relative).is_file():
@@ -34,7 +35,8 @@ def validate_directory(patch_root: Path) -> dict[str, Any]:
     if manifest_path.is_file():
         try:
             manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
-            schema = yaml.safe_load(SCHEMA.read_text(encoding="utf-8"))
+            packaged_schema = patch_root / "schemas/patch-manifest.schema.yaml"
+            schema = yaml.safe_load(packaged_schema.read_text(encoding="utf-8"))
             for issue in Draft202012Validator(schema).iter_errors(manifest):
                 errors.append({
                     "code": "manifest_schema_error",

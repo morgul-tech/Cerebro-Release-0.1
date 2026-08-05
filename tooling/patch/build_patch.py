@@ -10,6 +10,7 @@ INSTALLER = ROOT / "tooling/patch/install_patch.py"
 LOCATOR = ROOT / "tooling/patch/locate_cerebro.py"
 VALIDATOR = ROOT / "tooling/patch/validate_patch.py"
 PUBLISHER = ROOT / "tooling/patch/repository_publisher.py"
+MANIFEST_SCHEMA = ROOT / "schemas/patch-manifest.schema.yaml"
 BUILDS = ROOT / "builds" / "patches"
 EXIT_BUILD = 6
 
@@ -69,10 +70,12 @@ def build(plan_path: Path) -> Path:
         shutil.rmtree(work)
     (work / "repo").mkdir(parents=True)
     (work / "installer").mkdir(parents=True)
+    (work / "schemas").mkdir(parents=True)
 
     shutil.copy2(INSTALLER, work / "installer/patch_installer.py")
     shutil.copy2(LOCATOR, work / "installer/locate_cerebro.py")
     shutil.copy2(PUBLISHER, work / "installer/repository_publisher.py")
+    shutil.copy2(MANIFEST_SCHEMA, work / "schemas/patch-manifest.schema.yaml")
     (work / "INSTALL_PATCH.bat").write_text(bat_content(patch_id), encoding="ascii")
 
     manifest_files = []
