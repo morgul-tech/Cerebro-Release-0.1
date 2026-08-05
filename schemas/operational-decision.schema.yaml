@@ -1,0 +1,26 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-progress-decision/v1
+type: object
+additionalProperties: false
+required: [schema, objective_id, checkpoint, outcome, autonomy_level, reason, reporting]
+properties:
+  schema: {const: cerebro-progress-decision/v1}
+  objective_id: {type: string, minLength: 1}
+  checkpoint: {type: string, minLength: 1}
+  outcome: {enum: [CONTINUE, REMEDIATE_AND_CONTINUE, RETRY, USER_DECISION_REQUIRED, SAFETY_BLOCK]}
+  autonomy_level: {enum: [A, B, C, D]}
+  reason:
+    type: object
+    additionalProperties: false
+    required: [code, evidence]
+    properties:
+      code: {type: string, pattern: '^[A-Z0-9_]+$'}
+      evidence: {type: array, items: {type: string}}
+  reporting:
+    type: object
+    additionalProperties: false
+    required: [timing, severity]
+    properties:
+      timing: {enum: [immediate, after_segment, final]}
+      severity: {enum: [info, notable, critical]}
+

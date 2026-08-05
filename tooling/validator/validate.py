@@ -98,9 +98,13 @@ expected={f"AC-{i:03d}" for i in range(1,11)}
 missing_scenarios=sorted(expected-ids)
 result("RV-008", "pass" if not missing_scenarios else "fail", f"{len(scenarios)} acceptance scenarios declared" if not missing_scenarios else f"Missing: {missing_scenarios}")
 
-proc=subprocess.run([sys.executable,"run_tests.py"],cwd=ROOT,text=True,capture_output=True)
+proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/acceptance","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
 test_ok=proc.returncode==0 and "Ran 10 tests" in (proc.stdout+proc.stderr)
 result("RV-009","pass" if test_ok else "fail","10 executable acceptance tests passed" if test_ok else (proc.stdout+proc.stderr)[-2000:])
+
+progress_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/progress","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
+progress_ok=progress_proc.returncode==0 and "Ran 8 tests" in (progress_proc.stdout+progress_proc.stderr)
+result("RV-015","pass" if progress_ok else "fail","8 operational progress scenarios passed" if progress_ok else (progress_proc.stdout+progress_proc.stderr)[-2000:])
 
 try:
     sys.path.insert(0,str(ROOT))

@@ -42,4 +42,7 @@ criteria:
   - id: RV-014
     name: source_authority
     required: true
+  - id: RV-015
+    name: operational_progress_decisions
+    required: true
 release_rule: all_required_criteria_pass
