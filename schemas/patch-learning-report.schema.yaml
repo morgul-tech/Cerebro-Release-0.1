@@ -1,0 +1,17 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-patch-learning-report/v1
+type: object
+additionalProperties: false
+required: [schema, patch, result, classification, signature, lifecycle, autonomy_level, recommended_outcome, verification_profile, automatic_mutation_allowed]
+properties:
+  schema: {const: cerebro-patch-learning-report/v1}
+  patch: {type: string, minLength: 1}
+  result: {type: string, minLength: 1}
+  classification: {type: string, minLength: 1}
+  signature: {type: [string, 'null']}
+  lifecycle: {enum: [active, observed]}
+  autonomy_level: {enum: [A, B, C, D]}
+  recommended_outcome: {enum: [CONTINUE, REMEDIATE_AND_CONTINUE, RETRY, USER_DECISION_REQUIRED, SAFETY_BLOCK]}
+  verification_profile: {enum: [focused, standard, full]}
+  automatic_mutation_allowed: {type: boolean}
+

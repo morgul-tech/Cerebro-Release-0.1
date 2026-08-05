@@ -106,6 +106,10 @@ progress_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","te
 progress_ok=progress_proc.returncode==0 and "Ran 8 tests" in (progress_proc.stdout+progress_proc.stderr)
 result("RV-015","pass" if progress_ok else "fail","8 operational progress scenarios passed" if progress_ok else (progress_proc.stdout+progress_proc.stderr)[-2000:])
 
+plc_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/plc","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
+plc_ok=plc_proc.returncode==0 and "Ran 8 tests" in (plc_proc.stdout+plc_proc.stderr)
+result("RV-016","pass" if plc_ok else "fail","8 Patch Learning Controller scenarios passed" if plc_ok else (plc_proc.stdout+plc_proc.stderr)[-2000:])
+
 try:
     sys.path.insert(0,str(ROOT))
     from cerebro_runtime import CerebroRuntime

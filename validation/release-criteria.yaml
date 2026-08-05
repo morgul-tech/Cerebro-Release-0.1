@@ -45,4 +45,7 @@ criteria:
   - id: RV-015
     name: operational_progress_decisions
     required: true
+  - id: RV-016
+    name: patch_learning_controller
+    required: true
 release_rule: all_required_criteria_pass

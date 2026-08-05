@@ -1,0 +1,24 @@
+schema: cerebro-plc-signatures/v1
+signatures:
+- id: PLC-PY-CACHE-001
+  lifecycle: active
+  classification: regenerable_residue
+  match_any: [__pycache__, .pyc]
+  autonomy_level: A
+  outcome: REMEDIATE_AND_CONTINUE
+  verification_profile: focused
+- id: PLC-GENERATED-REPORT-001
+  lifecycle: active
+  classification: generated_report_residue
+  match_any: [validation/standards-report.json, validation/repository-report.json, validation/repository-report.txt, validation/validation-report.json]
+  autonomy_level: A
+  outcome: REMEDIATE_AND_CONTINUE
+  verification_profile: focused
+- id: PLC-LOCAL-PLAN-INTEGRITY-001
+  lifecycle: active
+  classification: local_plan_in_integrity_inventory
+  match_all: [integrity, plan.yaml]
+  autonomy_level: B
+  outcome: REMEDIATE_AND_CONTINUE
+  verification_profile: standard
+

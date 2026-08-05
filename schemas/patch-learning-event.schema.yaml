@@ -1,0 +1,15 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-patch-learning-event/v1
+type: object
+additionalProperties: false
+required: [schema, patch, result, exit_code, timestamp]
+properties:
+  schema: {const: cerebro-patch-learning-event/v1}
+  patch: {type: string, minLength: 1}
+  result: {type: string, minLength: 1}
+  exit_code: {type: integer}
+  timestamp: {type: string, minLength: 1}
+  detail: {type: string}
+  authoritative: {type: object}
+  backup: {type: [string, 'null']}
+

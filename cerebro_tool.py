@@ -26,6 +26,7 @@ COMMANDS = {
     "patch-install": ROOT / "tooling/patch/install_patch.py",
     "patch-validate": ROOT / "tooling/patch/validate_patch.py",
     "quality": ROOT / "tooling/quality/quality_gate.py",
+    "plc": ROOT / "tooling/plc/controller.py",
 }
 
 DEPENDENCY_REQUIRED = set(COMMANDS) - {"dependencies", "valider", "mcp"}

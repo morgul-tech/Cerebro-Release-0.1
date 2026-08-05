@@ -260,7 +260,13 @@ def publish(root: Path, repo: Path, manifest: dict[str, Any]) -> None:
         raise PatchError(Result.PUBLICATION_BLOCKED, f"Publication Gate exited {result.returncode}")
 
 
-def record_execution(manifest: dict[str, Any], result: Result, backup: Path | None) -> None:
+def record_execution(
+    manifest: dict[str, Any],
+    result: Result,
+    backup: Path | None,
+    repo: Path,
+    detail: str = "",
+) -> None:
     report_dir = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "Cerebro" / "reports" / "patch"
     report_dir.mkdir(parents=True, exist_ok=True)
     report = {
@@ -271,9 +277,32 @@ def record_execution(manifest: dict[str, Any], result: Result, backup: Path | No
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "authoritative": manifest["authoritative"],
         "backup": str(backup) if backup else None,
+        "detail": detail,
     }
     target = report_dir / f"{manifest['patch']['id']}-{datetime.now():%Y%m%d-%H%M%S-%f}.json"
     target.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    controller = repo / "tooling" / "plc" / "controller.py"
+    if controller.is_file():
+        try:
+            environment = os.environ.copy()
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(controller),
+                    str(target),
+                    "--record-dir",
+                    str(report_dir.parent / "plc"),
+                ],
+                cwd=repo,
+                env=environment,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+        except Exception:
+            # PLC is observational and must never alter the patch result.
+            pass
 
 
 def execute(root: Path, repo: Path, scripts: Path, manifest: dict[str, Any], install_only: bool) -> Result:
@@ -282,7 +311,7 @@ def execute(root: Path, repo: Path, scripts: Path, manifest: dict[str, Any], ins
     with ExecutionLock(repo):
         verify_authority(repo, manifest["authoritative"])
         if already_applied(root, manifest, targets):
-            record_execution(manifest, Result.ALREADY_APPLIED, None)
+            record_execution(manifest, Result.ALREADY_APPLIED, None, repo)
             return Result.ALREADY_APPLIED
         verify_baseline(manifest, targets)
         backup: Path | None = None
@@ -295,13 +324,13 @@ def execute(root: Path, repo: Path, scripts: Path, manifest: dict[str, Any], ins
             if not install_only:
                 run_quality_gate(root, repo)
                 publish(root, repo, manifest)
-            record_execution(manifest, Result.SUCCESS, backup)
+            record_execution(manifest, Result.SUCCESS, backup, repo)
             return Result.SUCCESS
         except Exception as exc:
             if rollback(journal):
-                record_execution(manifest, Result.FAILED_ROLLED_BACK, backup)
+                record_execution(manifest, Result.FAILED_ROLLED_BACK, backup, repo, str(exc))
                 raise PatchError(Result.FAILED_ROLLED_BACK, str(exc)) from exc
-            record_execution(manifest, Result.FAILED_RECOVERY_REQUIRED, backup)
+            record_execution(manifest, Result.FAILED_RECOVERY_REQUIRED, backup, repo, str(exc))
             raise PatchError(Result.FAILED_RECOVERY_REQUIRED, str(exc)) from exc
 
 
