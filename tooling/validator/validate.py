@@ -8,6 +8,15 @@ from jsonschema import Draft202012Validator, RefResolver
 
 ROOT = Path(__file__).resolve().parents[2]
 results: list[dict[str, Any]] = []
+INTEGRITY_TEXT_SUFFIXES = {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".bat"}
+INTEGRITY_TEXT_NAMES = {"LICENSE", "requirements.txt"}
+
+def integrity_digest(path: Path) -> str:
+    if path.name in INTEGRITY_TEXT_NAMES or path.suffix.lower() in INTEGRITY_TEXT_SUFFIXES:
+        text = path.read_text(encoding="utf-8")
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def result(cid: str, status: str, details: str) -> None:
     results.append({"id": cid, "status": status, "details": details})
@@ -109,7 +118,7 @@ if integrity_path.exists():
     for line in integrity_path.read_text().splitlines():
         if not line.strip(): continue
         digest,rel=line.split("  ",1); expected_hashes[rel]=digest
-    mismatches=[rel for rel,digest in expected_hashes.items() if not (ROOT/rel).exists() or hashlib.sha256((ROOT/rel).read_bytes()).hexdigest()!=digest]
+    mismatches=[rel for rel,digest in expected_hashes.items() if not (ROOT/rel).exists() or integrity_digest(ROOT/rel)!=digest]
     result("RV-011","pass" if not mismatches else "fail","Integrity manifest verified" if not mismatches else f"Mismatch: {mismatches}")
 else:
     result("RV-011","fail","Missing validation/integrity.sha256")

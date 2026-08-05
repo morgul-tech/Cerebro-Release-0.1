@@ -13,6 +13,14 @@ ALLOWED_SUFFIXES = {".py", ".yaml", ".yml", ".json", ".md", ".txt", ".bat"}
 ALLOWED_NAMES = {"LICENSE", "requirements.txt"}
 
 
+def integrity_digest(path: Path) -> str:
+    if path.name in ALLOWED_NAMES or path.suffix.lower() in ALLOWED_SUFFIXES:
+        text = path.read_text(encoding="utf-8")
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def included(path: Path) -> bool:
     rel = path.relative_to(ROOT).as_posix()
     if rel in GENERATED_RELATIVE_PATHS:
@@ -26,7 +34,7 @@ def main() -> int:
     VALIDATION_DIR.mkdir(parents=True, exist_ok=True)
     lines: list[str] = []
     for path in sorted(p for p in ROOT.rglob("*") if p.is_file() and included(p)):
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        digest = integrity_digest(path)
         lines.append(f"{digest}  {path.relative_to(ROOT).as_posix()}")
     target = VALIDATION_DIR / "integrity.sha256"
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")
