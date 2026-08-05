@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import importlib.metadata
 import json
 import os
+import shutil
 import subprocess
 import sys
 import urllib.error
@@ -30,6 +32,7 @@ MODES = (
     "pipeline",
     "standards",
     "runtime",
+    "doctor",
 )
 
 RESET = "\033[0m"
@@ -67,6 +70,14 @@ def enable_terminal_colors() -> bool:
 
 
 USE_COLOR = enable_terminal_colors()
+
+
+def configure_output_encoding() -> None:
+    if os.name == "nt" and hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
 
 
 def color(text: str, code: str) -> str:
@@ -270,6 +281,23 @@ def run_local(name: str, arguments: list[str]) -> Check:
     return Check(name, "fail", details[-500:] or f"exit {process.returncode}")
 
 
+def doctor_checks() -> list[Check]:
+    git = shutil.which("git")
+    checks = [
+        Check("Python", "pass", sys.version.split()[0]),
+        Check("Release root", "pass" if (ROOT / "cerebro_tool.py").is_file() else "fail", str(ROOT)),
+        Check("Git repository", "pass" if (ROOT / ".git").exists() else "warning", "Local Git metadata"),
+        Check("Git executable", "pass" if git else "warning", git or "Not on PATH"),
+        Check("PyYAML", "pass", getattr(yaml, "__version__", "available")),
+    ]
+    try:
+        import jsonschema
+        checks.append(Check("jsonschema", "pass", importlib.metadata.version("jsonschema")))
+    except ImportError:
+        checks.append(Check("jsonschema", "fail", "Missing; automatic installation is prohibited"))
+    return checks
+
+
 def quick_checks(target: str = "both") -> list[Check]:
     checks: list[Check] = [mcp_check()]
     source_check = Check("Source", "not_checked")
@@ -367,6 +395,7 @@ def report_json(checks: list[Check], mode: str) -> dict[str, Any]:
 
 
 def main() -> int:
+    configure_output_encoding()
     parser = argparse.ArgumentParser(description="Cerebro common validation command")
     parser.add_argument("mode", nargs="?", default="quick", choices=MODES)
     parser.add_argument("--json", action="store_true", dest="json_output")
@@ -374,7 +403,9 @@ def main() -> int:
     args = parser.parse_args()
 
     mode = args.mode
-    if mode == "source":
+    if mode == "doctor":
+        checks = doctor_checks()
+    elif mode == "source":
         checks = quick_checks("source")
     elif mode == "release":
         checks = quick_checks("release")

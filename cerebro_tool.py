@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -22,6 +23,7 @@ COMMANDS = {
     "pipeline": ROOT / "tooling/pipeline/run_pipeline.py",
     "dependencies": ROOT / "tooling/dependencies/check_dependencies.py",
     "patch-build": ROOT / "tooling/patch/build_patch.py",
+    "patch-install": ROOT / "tooling/patch/install_patch.py",
     "patch-validate": ROOT / "tooling/patch/validate_patch.py",
     "quality": ROOT / "tooling/quality/quality_gate.py",
 }
@@ -33,20 +35,32 @@ def run_script(script: Path, *arguments: str) -> int:
     if not script.is_file():
         print(f"[FAIL] Required tooling file is missing: {script}")
         return 4
+    environment = os.environ.copy()
+    environment["PYTHONDONTWRITEBYTECODE"] = "1"
     return subprocess.run(
         [sys.executable, str(script), *arguments],
         cwd=ROOT,
+        env=environment,
     ).returncode
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Local tooling for Cerebro Release 0.1")
-    parser.add_argument("command", choices=sorted((*COMMANDS.keys(), "install")))
+    parser.add_argument(
+        "command",
+        choices=sorted((*COMMANDS.keys(), "doctor", "install", "status")),
+    )
     parser.add_argument("arguments", nargs=argparse.REMAINDER)
     args = parser.parse_args()
 
     if args.command == "install":
         return run_script(COMMANDS["dependencies"], "install")
+
+    if args.command == "status":
+        return run_script(COMMANDS["valider"], *args.arguments)
+
+    if args.command == "doctor":
+        return run_script(COMMANDS["valider"], "doctor", *args.arguments)
 
     if args.command in DEPENDENCY_REQUIRED:
         status = run_script(COMMANDS["dependencies"], "check")
