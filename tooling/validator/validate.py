@@ -76,7 +76,13 @@ for mode,mods in activation.get("by_work_mode",{}).items():
 result("RV-005", "pass" if not unknown else "fail", "Activation references registered modules" if not unknown else f"Unknown: {unknown}")
 
 transitions=docs.get("engines/dialog/transitions.yaml",{}).get("transitions",{})
-states=set(docs.get("core/terminology.yaml",{}).get("terms",{}).get("dialog_state",[]))
+terminology=docs.get("core/terminology.yaml",{})
+states=set(
+    terminology.get("runtime_enums",{}).get(
+        "dialog_state",
+        terminology.get("terms",{}).get("dialog_state",[]),
+    )
+)
 bad=[]
 for src,dsts in transitions.items():
     if src not in states: bad.append(src)
@@ -109,6 +115,10 @@ result("RV-015","pass" if progress_ok else "fail","8 operational progress scenar
 plc_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/plc","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
 plc_ok=plc_proc.returncode==0 and "Ran 8 tests" in (plc_proc.stdout+plc_proc.stderr)
 result("RV-016","pass" if plc_ok else "fail","8 Patch Learning Controller scenarios passed" if plc_ok else (plc_proc.stdout+plc_proc.stderr)[-2000:])
+
+terminology_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/terminology","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
+terminology_ok=terminology_proc.returncode==0 and "Ran 5 tests" in (terminology_proc.stdout+terminology_proc.stderr)
+result("RV-017","pass" if terminology_ok else "fail","5 terminology level-zero scenarios passed" if terminology_ok else (terminology_proc.stdout+terminology_proc.stderr)[-2000:])
 
 try:
     sys.path.insert(0,str(ROOT))

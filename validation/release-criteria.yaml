@@ -48,4 +48,7 @@ criteria:
   - id: RV-016
     name: patch_learning_controller
     required: true
+  - id: RV-017
+    name: terminology_level_zero
+    required: true
 release_rule: all_required_criteria_pass

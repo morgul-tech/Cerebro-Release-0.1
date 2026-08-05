@@ -1,0 +1,28 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-terminology/v0.2
+type: object
+additionalProperties: false
+required: [schema, authority, language, terms, contextual_aliases, runtime_enums]
+properties:
+  schema: {const: cerebro-terminology/v0.2}
+  authority:
+    type: object
+    required: [source, source_path, role]
+  language:
+    type: object
+    required: [machine_identifiers, user_language]
+  terms:
+    type: object
+    minProperties: 1
+    additionalProperties:
+      type: object
+      additionalProperties: false
+      required: [term, aliases, definition]
+      properties:
+        term: {type: string, minLength: 1}
+        aliases: {type: array, uniqueItems: true, items: {type: string, minLength: 1}}
+        definition: {type: string, minLength: 1}
+        authority_dimension: {type: string, minLength: 1}
+  contextual_aliases: {type: object}
+  runtime_enums: {type: object}
+

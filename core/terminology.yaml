@@ -1,14 +1,92 @@
-schema: cerebro-terminology/v0.1
+schema: cerebro-terminology/v0.2
+authority:
+  source: Cerebro Source 1.0
+  source_path: modules/terminology/terms.yaml
+  role: derived-runtime-terminology
+language:
+  machine_identifiers: English
+  user_language: Norwegian
 terms:
+  cerebro:
+    term: Cerebro
+    aliases: [systemet, hele systemet]
+    definition: Hele det styrte Cerebro-systemet.
+  cerebro_source:
+    term: Cerebro Source
+    aliases: [source, kilden]
+    definition: Eneste policyautoritet for Cerebros betydning, regler, arkitektur og standarder.
+    authority_dimension: policy
+  source_repository:
+    term: Source repository
+    aliases: [source repo, source-repoet, source github]
+    definition: Git-repositoriet som publiserer Cerebro Source.
+  published_source_baseline:
+    term: Published Source baseline
+    aliases: [gjeldende source, publisert source, source baseline]
+    definition: Eksakt repository, branch og commit for gjeldende publisert Source.
+  working_source:
+    term: Working Source
+    aliases: [lokal source, arbeids-source]
+    definition: Utpekt lokal Git-arbeidskopi for Source.
+  cerebro_release:
+    term: Cerebro Release
+    aliases: [release]
+    definition: Validert og versjonert implementasjon avledet fra Cerebro Source.
+    authority_dimension: derived-implementation
+  release_repository:
+    term: Release repository
+    aliases: [release repo, release-repoet, release github]
+    definition: Git-repositoriet som publiserer Cerebro Release.
+  published_release_baseline:
+    term: Published Release baseline
+    aliases: [gjeldende release, publisert release, release baseline, autoritativ release]
+    definition: Eksakt repository, branch og commit for gjeldende publisert Release-implementasjon.
+    authority_dimension: published-implementation-bytes
+  working_release:
+    term: Working Release
+    aliases: [lokal release, arbeids-release]
+    definition: Utpekt lokal Git-arbeidskopi for Release.
+  cerebro_runtime:
+    term: Cerebro Runtime
+    aliases: [runtime, aktiv cerebro, kjørende cerebro]
+    definition: Aktiv instans av én identifisert Cerebro Release.
+  cerebro_workspace:
+    term: Cerebro workspace
+    aliases: [workspace, cerebro-mappen, arbeidsområdet]
+    definition: Lokalt arbeidsområde som ikke får autoritet av plasseringen alene.
+  git_repository:
+    term: Git repository
+    aliases: [repo, repository, git-repo]
+    definition: Versjonskontrollert objekt med commits, referanser og historikk.
+  commit:
+    term: Commit
+    aliases: [commit-id, sha]
+    definition: Uforanderlig Git-objekt for én eksakt repository-tilstand.
+  synchronization:
+    term: Synkronisering
+    aliases: [synk, synkron, synkronisert, samme versjon]
+    definition: Verifisert likhetsforhold mellom navngitte objekter for deklarert scope og commit.
+contextual_aliases:
+  source_main:
+    aliases: [source main]
+    resolves_to: source_repository_main_head
+    freshness: verify_before_use
+  release_main:
+    aliases: [release main]
+    resolves_to: release_repository_main_head
+    freshness: verify_before_use
+  both:
+    aliases: [begge, source og release]
+    resolution: active_local_or_remote_context
+  release:
+    alias: release
+    conceptual: cerebro_release
+    local_file_validation_install: working_release
+    github_remote_branch_commit: release_repository_or_published_release_baseline
+    synchronization: compare_working_release_to_published_release_baseline
+runtime_enums:
   work_mode: [unclassified, standard, collaboration, project]
   dialog_state: [information, analysis, recommendation, clarification, work, verification, finalization]
   context_type: [fact, assessment, recommendation, decision, current_basis, assumption, open_question, constraint]
   runtime_status: [initializing, active, blocked, verifying, completed, failed]
   quality_status: [unchecked, pass, warning, fail]
-definitions:
-  assessment: Analysis that is not authoritative.
-  recommendation: Proposed direction based on analysis.
-  decision: Explicitly chosen direction for further work.
-  current_basis: Authorized information governing further work.
-  active_context: Relevant active information for the current task.
-  control_stop: Blocking state requiring resolution before progress.
