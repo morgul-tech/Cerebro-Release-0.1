@@ -27,6 +27,7 @@ COMMANDS = {
     "patch-validate": ROOT / "tooling/patch/validate_patch.py",
     "quality": ROOT / "tooling/quality/quality_gate.py",
     "plc": ROOT / "tooling/plc/controller.py",
+    "project-status": ROOT / "tooling/status/project_status.py",
 }
 
 DEPENDENCY_REQUIRED = set(COMMANDS) - {"dependencies", "valider", "mcp"}
@@ -58,7 +59,9 @@ def main() -> int:
         return run_script(COMMANDS["dependencies"], "install")
 
     if args.command == "status":
-        return run_script(COMMANDS["valider"], *args.arguments)
+        if args.arguments and args.arguments[0] == "health":
+            return run_script(COMMANDS["valider"], *args.arguments[1:])
+        return run_script(COMMANDS["project-status"], *args.arguments)
 
     if args.command == "doctor":
         return run_script(COMMANDS["valider"], "doctor", *args.arguments)

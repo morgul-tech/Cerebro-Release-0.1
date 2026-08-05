@@ -120,6 +120,10 @@ terminology_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s",
 terminology_ok=terminology_proc.returncode==0 and "Ran 5 tests" in (terminology_proc.stdout+terminology_proc.stderr)
 result("RV-017","pass" if terminology_ok else "fail","5 terminology level-zero scenarios passed" if terminology_ok else (terminology_proc.stdout+terminology_proc.stderr)[-2000:])
 
+status_proc=subprocess.run([sys.executable,"-m","unittest","discover","-s","tests/status","-p","test_*.py"],cwd=ROOT,text=True,capture_output=True)
+status_ok=status_proc.returncode==0 and "Ran 6 tests" in (status_proc.stdout+status_proc.stderr)
+result("RV-018","pass" if status_ok else "fail","6 shared project status scenarios passed" if status_ok else (status_proc.stdout+status_proc.stderr)[-2000:])
+
 try:
     sys.path.insert(0,str(ROOT))
     from cerebro_runtime import CerebroRuntime

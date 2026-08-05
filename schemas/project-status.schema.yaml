@@ -1,0 +1,28 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: cerebro-project-status/v1
+type: object
+additionalProperties: false
+required: [schema, depth, scope, system_health, latest_implementations, active_implementation, next_implementation, working_notes, loose_thoughts, blockers, recommendations, evidence]
+properties:
+  schema: {const: cerebro-project-status/v1}
+  depth: {enum: [brief, standard, deep]}
+  scope: {type: [string, 'null']}
+  system_health: {type: array}
+  latest_implementations: {type: array}
+  active_implementation: {type: array}
+  next_implementation: {type: object}
+  working_notes: {type: array}
+  loose_thoughts: {type: array}
+  blockers: {type: array}
+  recommendations:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [weight, action, reason]
+      properties:
+        weight: {type: integer, minimum: 1, maximum: 3}
+        action: {type: string, minLength: 1}
+        reason: {type: string, minLength: 1}
+  evidence: {type: object}
+
