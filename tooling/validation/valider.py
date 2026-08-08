@@ -243,10 +243,24 @@ def validate_sync(
 def mcp_check() -> Check:
     try:
         manifest = remote_yaml(SOURCE_REPO, "mcp/manifest.yaml")
-        if manifest.get("mcp", {}).get("level") != 1:
-            return Check("MCP", "fail", "MCP level is not 1")
-        if manifest.get("mcp", {}).get("default_state") != "active":
-            return Check("MCP", "fail", "MCP is not active by default")
+        mcp = manifest.get("mcp", {})
+        required = {
+            "component_kind": "CONTROL",
+            "default_state": "active",
+            "control_contract": "standards/control-architecture.yaml",
+            "authority_scope": "highest-internal-control",
+        }
+        mismatches = [
+            f"{key}={mcp.get(key)!r}"
+            for key, expected in required.items()
+            if mcp.get(key) != expected
+        ]
+        if mismatches:
+            return Check(
+                "MCP",
+                "fail",
+                "Source MCP contract mismatch: " + ", ".join(mismatches),
+            )
 
         state = "active"
         if MCP_STATE_FILE.is_file():
@@ -255,11 +269,9 @@ def mcp_check() -> Check:
 
         if state == "inactive":
             return Check("MCP", "warning", "Inactive by user command")
-        return Check("MCP", "pass", "Level 1 · Active")
+        return Check("MCP", "pass", "CONTROL · Active")
     except Exception as exc:
         return Check("MCP", "fail", str(exc))
-
-
 def gate_check(name: str, path: str) -> Check:
     try:
         raw_text(RELEASE_REPO, path)

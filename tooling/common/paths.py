@@ -12,6 +12,7 @@ GENERATED_RELATIVE_PATHS = {
     "validation/repository-report.json",
     "validation/repository-report.txt",
     "validation/standards-report.json",
+    "validation/builder-pipeline-report.json",
     "reports/validation-report.txt",
 }
 GENERATED_TOP_LEVEL_DIRS = {"builds", ".git", "__pycache__", ".pytest_cache"}
